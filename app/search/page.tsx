@@ -51,7 +51,7 @@ export default async function SearchPage({ searchParams }: Props) {
             <p className="text-muted text-sm font-bold mb-6" aria-live="polite" aria-atomic="true">
               {results.length.toLocaleString()} game{results.length !== 1 ? 's' : ''} found
             </p>
-            <GameGrid games={results} columns={4} priorityCount={8} />
+            <GameGrid games={results} priorityCount={8} />
           </>
         ) : (
           <NoResults query={query} />
