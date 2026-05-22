@@ -1,0 +1,341 @@
+@import "tailwindcss";
+
+@theme {
+  /* Strawberry accent — warm, friendly, high-energy */
+  --color-accent:       oklch(61% 0.24 28);
+  --color-accent-hover: oklch(54% 0.24 28);
+  --color-accent-light: oklch(97% 0.018 28);
+
+  /* Light mode surfaces */
+  --color-background:   oklch(99.2% 0.002 250);
+  --color-surface:      oklch(100% 0 0);
+  --color-navy:         oklch(97.2% 0.003 250);
+  --color-navy-light:   oklch(98.4% 0.002 250);
+  --color-game-surface: oklch(96.5% 0.004 250);
+
+  /* Text & Borders */
+  --color-fg:           oklch(18% 0.006 250);
+  --color-muted:        oklch(48% 0.008 250);
+  --color-border:       oklch(91.5% 0.004 250);
+
+  /* Typography */
+  --font-sans: var(--font-nunito), "Nunito", sans-serif;
+  --font-display: var(--font-outfit), "Outfit", sans-serif;
+
+  /* Rounded corners */
+  --radius-sm:   10px;
+  --radius-md:  14px;
+  --radius-lg:  18px;
+  --radius-xl:  24px;
+  --radius-2xl: 32px;
+}
+
+/* ─── Dark mode overrides ─────────────────────────────────── */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-background:   oklch(13% 0.006 250);
+  --color-surface:      oklch(17% 0.008 250);
+  --color-navy:         oklch(19.5% 0.007 250);
+  --color-navy-light:   oklch(21.5% 0.007 250);
+  --color-game-surface: oklch(18% 0.007 250);
+  --color-fg:           oklch(93% 0.004 250);
+  --color-muted:        oklch(57% 0.008 250);
+  --color-border:       oklch(26% 0.012 250);
+  --color-accent-light: oklch(21% 0.04 28);
+}
+
+/* Motion tokens */
+:root {
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast:  150ms;
+  --duration-base:  200ms;
+  --duration-slow:  400ms;
+}
+
+/* ─── Search overlay animation ───────────────────────────── */
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.search-overlay-panel {
+  animation: slide-down 0.18s var(--ease-out-quart) both;
+}
+
+/* ─── Settings panel animation ───────────────────────────── */
+@keyframes settings-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+.settings-panel {
+  animation: settings-in 0.15s var(--ease-out-quart) both;
+}
+
+/* ─── Base ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;  /* overridden by [data-theme="dark"] above */
+  background-color: var(--color-background);
+}
+
+body {
+  background-color: transparent;
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-kerning: normal;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+/* Full-screen fixed page backdrop */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--color-background);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: oklch(80% 0.01 255);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover { background: oklch(70% 0.01 255); }
+
+/* Focus ring */
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ─── Game Card ──────────────────────────────────────────────── */
+.game-card {
+  transition:
+    transform         var(--duration-base) var(--ease-out-quart),
+    box-shadow        var(--duration-base) var(--ease-out-quart),
+    border-color      var(--duration-base) var(--ease-out-quart);
+  box-shadow: 0 4px 16px oklch(22% 0.015 255 / 0.03);
+}
+
+@keyframes ken-burns {
+  0%   { transform: scale(1)    translate(0, 0); }
+  100% { transform: scale(1.05) translate(-1%, -0.5%); }
+}
+
+@media (hover: hover) {
+  .game-card:hover {
+    transform:    translateY(-6px) scale(1.01);
+    box-shadow:   0 16px 36px oklch(22% 0.015 255 / 0.08),
+                  0 0 0 2px var(--color-accent);
+    border-color: transparent;
+  }
+
+  .game-card:hover .game-card-thumb {
+    animation: ken-burns 5s var(--ease-out-expo) forwards;
+    transition: opacity var(--duration-base) var(--ease-out-quart);
+  }
+
+  .game-card:hover .game-card-play {
+    opacity:   1;
+    transform: scale(1);
+  }
+}
+
+/* Active state for touch */
+.game-card:active { transform: translateY(-2px); }
+
+.game-card-thumb {
+  transition: transform var(--duration-slow) var(--ease-out-expo);
+  will-change: transform;
+}
+
+.game-card-play {
+  opacity:    0;
+  transform:  scale(0.7);
+  transition:
+    opacity   var(--duration-base) var(--ease-out-quart),
+    transform var(--duration-base) var(--ease-out-quart);
+}
+
+/* ─── Skeleton ───────────────────────────────────────────────── */
+@keyframes skeleton-sweep {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    oklch(95% 0.005 255) 0%,
+    oklch(91% 0.008 255) 40%,
+    oklch(95% 0.005 255) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-sweep 1.6s var(--ease-out-quart) infinite;
+}
+
+/* ─── Card entrance (stagger) ────────────────────────────────── */
+@keyframes card-in {
+  from {
+    opacity:   0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity:   1;
+    transform: translateY(0);
+  }
+}
+
+.card-enter {
+  animation: card-in 0.45s var(--ease-out-expo) both;
+  animation-delay: var(--stagger, 0ms);
+}
+
+/* ─── Overdrive: CSS scroll-driven reveal ── */
+/* ─── Horizontal strip scrollbar ────────────────────────────── */
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hidden::-webkit-scrollbar { display: none; }
+
+/* ─── Reduced motion ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .game-card,
+  .game-card-thumb,
+  .game-card-play {
+    transition: border-color var(--duration-fast) linear,
+                opacity      var(--duration-fast) linear !important;
+    animation: none !important;
+  }
+  .game-card:hover { transform: none !important; box-shadow: none !important; }
+  .skeleton        { animation: none; background: oklch(93% 0.005 255); }
+  .card-enter      { animation: none; opacity: 1; transform: none; }
+}
+
+/* ─── Playful Ambient Glows (Light Mode Pastel Halos) ─────────── */
+@keyframes ambient-pulse {
+  0%, 100% {
+    opacity: 0.20;
+    transform: scale(1);
+    filter: blur(56px);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(1.05);
+    filter: blur(72px);
+  }
+}
+
+.ambient-glow-bg {
+  animation: ambient-pulse 8s ease-in-out infinite;
+  will-change: transform, opacity, filter;
+}
+
+.game-card-spotlight {
+  position: relative;
+  box-shadow:
+    0 0 0 2px var(--color-accent),
+    0 8px 32px oklch(61% 0.24 28 / 0.22),
+    0 2px 8px oklch(10% 0.01 250 / 0.12);
+}
+
+.game-card-spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--color-accent), oklch(72% 0.20 42) 50%, var(--color-accent));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Soft Light-Mode Scanline Overlay (Almost invisible, just for microtexture) */
+.scanlines {
+  position: relative;
+  overflow: hidden;
+}
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(255, 255, 255, 0) 50%, 
+    rgba(0, 0, 0, 0.02) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.35;
+}
+
+/* Active touch/click state scale down */
+.active-click {
+  transition: transform 100ms var(--ease-out-quart);
+}
+.active-click:active {
+  transform: scale(0.96) !important;
+}
+
+.title-display {
+  font-family: var(--font-display);
+}
+
+/* Poki-style dense grid — auto-fit + fixed cols + justify-content:center để last row luôn được căn giữa */
+.grid-poki {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 130px);
+  grid-auto-rows: 175px;
+  justify-content: center;
+  gap: 10px;
+}
+@media (min-width: 640px) {
+  .grid-poki {
+    grid-template-columns: repeat(auto-fit, 145px);
+    grid-auto-rows: 195px;
+    gap: 12px;
+  }
+}
+@media (min-width: 1024px) {
+  .grid-poki {
+    grid-template-columns: repeat(auto-fit, 160px);
+    grid-auto-rows: 215px;
+    gap: 16px;
+  }
+}
+
+/* Standard grid (category, games pages) — same centering approach */
+.grid-standard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 150px);
+  grid-auto-rows: 200px;
+  justify-content: center;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .grid-standard {
+    grid-template-columns: repeat(auto-fit, 178px);
+    grid-auto-rows: 235px;
+    gap: 14px;
+  }
+}
+@media (min-width: 1024px) {
+  .grid-standard {
+    grid-template-columns: repeat(auto-fit, 212px);
+    grid-auto-rows: 278px;
+    gap: 16px;
+  }
+}
