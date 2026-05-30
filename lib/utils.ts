@@ -22,31 +22,61 @@ export function truncate(text: string, max: number): string {
 }
 
 export function normalizeCategory(raw: string): string {
+  // Keys are substrings to match (checked in order — put longer/more-specific keys first).
+  // Values must exactly match a CATEGORIES[].name so CategoryBadge can resolve the slug.
   const map: Record<string, string> = {
+    // Specific multi-word patterns first
+    'hyper casual': 'Hypercasual',
+    hypercasual: 'Hypercasual',
+    'tower defense': 'Strategy',
+    'tower defence': 'Strategy',
+    'two-player': '2 Player',
+    'two player': '2 Player',
+    '2player': '2 Player',
+    '2 player': '2 Player',
+    'dress up': 'Girls',
+    dressup: 'Girls',
+    // Single-word patterns
     action: 'Action',
     adventure: 'Adventure',
     puzzle: 'Puzzle',
     racing: 'Racing',
-    sports: 'Sports',
-    io: 'IO',
+    sport: 'Sports',
     '.io': 'IO',
+    io: 'IO',
     casual: 'Casual',
     shooting: 'Shooting',
+    'bullet hell': 'Shooting',
     skill: 'Skill',
     arcade: 'Arcade',
-    'two-player': 'Two Player',
+    strategy: 'Strategy',
     multiplayer: 'Multiplayer',
     '3d': '3D',
-    car: 'Car',
     driving: 'Car',
+    car: 'Car',
     clicker: 'Clicker',
+    idle: 'Clicker',
     cooking: 'Cooking',
     stickman: 'Stickman',
-    'tower defense': 'Tower Defense',
-    strategy: 'Strategy',
+    fighting: 'Fighting',
+    fight: 'Fighting',
+    running: 'Running',
+    runner: 'Running',
+    zombie: 'Zombie',
+    horror: 'Horror',
+    scary: 'Horror',
+    beauty: 'Beauty',
+    makeup: 'Beauty',
+    simulation: 'Simulation',
+    simulator: 'Simulation',
+    football: 'Soccer',
+    soccer: 'Soccer',
+    basketball: 'Sports',
+    platformer: 'Platformer',
+    platform: 'Platformer',
     girls: 'Girls',
-    boys: 'Boys',
     kids: 'Kids',
+    boys: 'Action',       // no Boys category — closest is Action
   };
 
   const lower = raw.toLowerCase().trim();

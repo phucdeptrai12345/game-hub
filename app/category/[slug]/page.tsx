@@ -1,14 +1,19 @@
 import { notFound } from 'next/navigation';
 import { getGamesByCategory } from '@/lib/gamemonetize';
+import { getY8GamesByCategory } from '@/lib/y8';
 import { getCategoryBySlug, CATEGORIES } from '@/constants/categories';
 import GameGrid from '@/components/ui/GameGrid';
+import Pagination from '@/components/ui/Pagination';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
 
+const PAGE_SIZE = 120;
+
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 }
 
 const categoryContent: Record<string, { intro: string; body: string[]; tip: string }> = {
@@ -201,12 +206,22 @@ export async function generateStaticParams() {
   return CATEGORIES.map((cat) => ({ slug: cat.slug }));
 }
 
-export default async function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const sp = await searchParams;
+  const page = Math.max(1, parseInt(sp.page ?? '1', 10));
+
   const cat = getCategoryBySlug(slug);
   if (!cat) notFound();
 
-  const games = await getGamesByCategory(cat.name);
+  const [gmGames, y8Games] = await Promise.all([
+    getGamesByCategory(cat.name),
+    getY8GamesByCategory(cat.slug),
+  ]);
+  // Y8 games first (more varied / recognizable), then GameMonetize
+  const games = [...y8Games, ...gmGames];
+  const totalPages = Math.ceil(games.length / PAGE_SIZE);
+  const paged = games.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const content = getCategoryContent(slug);
 
   return (
@@ -221,9 +236,10 @@ export default async function CategoryPage({ params }: Props) {
         </p>
       </div>
 
-      {games.length > 0 ? (
+      {paged.length > 0 ? (
         <>
-          <GameGrid games={games} priorityCount={8} showAds={false} />
+          <GameGrid games={paged} priorityCount={8} showAds={false} />
+          {totalPages > 1 && <Pagination currentPage={page} totalPages={totalPages} />}
 
           {/* Description block */}
           <div className="mt-16 pt-10 border-t border-border/60">

@@ -1,8 +1,13 @@
 import { Game } from './types';
 import { slugify, normalizeCategory } from './utils';
+import { BLOCKED_GAME_IDS, BLOCKED_DEVELOPERS, BLOCKED_KEYWORDS } from './game-blocklist';
 
-const FEED_BASE = 'https://gamemonetize.com/feed.php';
+const FEED_BASE = 'https://rss.gamemonetize.com/rssfeed.php';
 const PAGE_SIZE = 500;
+
+let _gmCache: Game[] | null = null;
+let _gmCacheTime = 0;
+const GM_CACHE_TTL = 60 * 60 * 1000; // 1 hour in-process cache
 
 interface RawGame {
   id: string;
@@ -28,8 +33,40 @@ function decodeHtml(str: string): string {
     .replace(/&apos;/g, "'");
 }
 
+function passesQualityFilter(raw: RawGame): boolean {
+  // Manual blocklists
+  if (BLOCKED_GAME_IDS.has(raw.id)) return false;
+  if (raw.developer && BLOCKED_DEVELOPERS.has(raw.developer.toLowerCase())) return false;
+
+  // Must have a real title (not just numbers or <3 chars)
+  const title = (raw.title || '').trim();
+  if (title.length < 3) return false;
+
+  // Must have a valid game URL
+  if (!raw.url || !raw.url.startsWith('http')) return false;
+
+  // Must have a thumbnail
+  if (!raw.thumb || !raw.thumb.startsWith('http')) return false;
+
+  // Must have a real description — 40 chars filters out "Play this game!" placeholders
+  const desc = (raw.description || '').trim();
+  if (desc.length < 40) return false;
+
+  // Reasonable dimensions (not 0 or absurdly small)
+  const w = parseInt(raw.width || '0', 10);
+  const h = parseInt(raw.height || '0', 10);
+  if (w > 0 && w < 200) return false;
+  if (h > 0 && h < 150) return false;
+
+  // Keyword filter on title + tags
+  const haystack = `${title} ${raw.tags || ''}`.toLowerCase();
+  if (BLOCKED_KEYWORDS.some((kw) => haystack.includes(kw))) return false;
+
+  return true;
+}
+
 function parseGame(raw: RawGame): Game {
-  const title = decodeHtml(raw.title || '');
+  const title = decodeHtml(raw.title || '').trim();
   return {
     id: raw.id,
     title,
@@ -48,8 +85,9 @@ function parseGame(raw: RawGame): Game {
   };
 }
 
-async function fetchPage(page: number): Promise<RawGame[]> {
-  const url = `${FEED_BASE}?format=0&num=${PAGE_SIZE}&page=${page}`;
+async function fetchPage(page: number, popularity = 'mostplayed'): Promise<RawGame[]> {
+  // New endpoint supports popularity= sort; amount=500 for bulk fetch
+  const url = `${FEED_BASE}?format=json&type=html5&popularity=${popularity}&category=All&company=All&amount=${PAGE_SIZE}&page=${page}`;
   const res = await fetch(url, {
     next: { revalidate: 3600 },
   });
@@ -59,24 +97,27 @@ async function fetchPage(page: number): Promise<RawGame[]> {
 }
 
 export async function getAllGames(): Promise<Game[]> {
-  const allRaw: RawGame[] = [];
+  if (_gmCache && Date.now() - _gmCacheTime < GM_CACHE_TTL) return _gmCache;
 
-  // Fetch sequentially to avoid rate limiting — API supports up to 5 pages (2500 games)
-  for (let page = 1; page <= 5; page++) {
-    const batch = await fetchPage(page);
-    if (batch.length === 0) break;
-    allRaw.push(...batch);
-    if (batch.length < PAGE_SIZE) break;
-  }
+  // API returns same ~500 games for every page (no real pagination for mostplayed).
+  // Fetch mostplayed + newest in parallel to maximise unique games.
+  const [rawMostPlayed, rawNewest] = await Promise.all([
+    fetchPage(1, 'mostplayed'),
+    fetchPage(1, 'newest'),
+  ]);
 
-  const games = allRaw.map(parseGame);
-  // Deduplicate by slug
   const seen = new Set<string>();
-  return games.filter((g) => {
-    if (seen.has(g.slug)) return false;
-    seen.add(g.slug);
-    return true;
-  });
+  _gmCache = [...rawMostPlayed, ...rawNewest]
+    .filter(passesQualityFilter)
+    .map(parseGame)
+    .filter((g) => {
+      if (seen.has(g.slug)) return false;
+      seen.add(g.slug);
+      return true;
+    });
+
+  _gmCacheTime = Date.now();
+  return _gmCache;
 }
 
 export async function getGameBySlug(slug: string): Promise<Game | null> {
@@ -103,19 +144,26 @@ export async function searchGames(query: string): Promise<Game[]> {
   );
 }
 
-export async function getFeaturedGames(count = 8): Promise<Game[]> {
-  const games = await getAllGames();
-  return games.slice(0, count);
+function dedupeSlice(games: Game[], count: number): Game[] {
+  const seen = new Set<string>();
+  const result: Game[] = [];
+  for (const g of games) {
+    if (seen.has(g.slug)) continue;
+    seen.add(g.slug);
+    result.push(g);
+    if (result.length >= count) break;
+  }
+  return result;
 }
 
-export async function getNewGames(count = 12): Promise<Game[]> {
-  const games = await getAllGames();
-  return games.slice(0, count);
+/** Returns the most-played games according to GameMonetize's own popularity ranking. */
+export async function getMostPlayedGames(count = 200): Promise<Game[]> {
+  const raw = await fetchPage(1, 'mostplayed');
+  return dedupeSlice(raw.filter(passesQualityFilter).map(parseGame), count);
 }
 
-export async function getRelatedGames(game: Game, count = 8): Promise<Game[]> {
-  const games = await getAllGames();
-  return games
-    .filter((g) => g.id !== game.id && g.category === game.category)
-    .slice(0, count);
+/** Returns the newest games according to GameMonetize. */
+export async function getNewestGames(count = 200): Promise<Game[]> {
+  const raw = await fetchPage(1, 'newest');
+  return dedupeSlice(raw.filter(passesQualityFilter).map(parseGame), count);
 }

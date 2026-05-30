@@ -1,4 +1,6 @@
 import { searchGames } from '@/lib/gamemonetize';
+import { searchY8Games } from '@/lib/y8';
+import type { Game } from '@/lib/types';
 import SearchBar from '@/components/SearchBar';
 import GameGrid from '@/components/ui/GameGrid';
 import Link from 'next/link';
@@ -23,7 +25,17 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 export default async function SearchPage({ searchParams }: Props) {
   const params = await searchParams;
   const query = params.q ?? '';
-  const results = query ? await searchGames(query) : [];
+  let results: Game[] = [];
+  if (query) {
+    const [gmResults, y8Results] = await Promise.all([searchGames(query), searchY8Games(query)]);
+    const combined = [...y8Results, ...gmResults];
+    const seen = new Set<string>();
+    results = combined.filter((g) => {
+      if (seen.has(g.id)) return false;
+      seen.add(g.id);
+      return true;
+    });
+  }
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-10">

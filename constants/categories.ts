@@ -25,7 +25,7 @@ export const CATEGORIES: Category[] = [
   {
     slug: 'sports',
     name: 'Sports',
-    icon: '⚽',
+    icon: '🏅',
     color: { bg: 'oklch(93% 0.05 148)', text: 'oklch(36% 0.16 148)' },
     description: 'Football, basketball, golf, and more.',
   },
@@ -144,7 +144,7 @@ export const CATEGORIES: Category[] = [
   {
     slug: 'hypercasual',
     name: 'Hypercasual',
-    icon: '⚡',
+    icon: '🌀',
     color: { bg: 'oklch(95% 0.05 62)', text: 'oklch(38% 0.16 62)' },
     description: 'Simple one-tap games with addictive loops.',
   },

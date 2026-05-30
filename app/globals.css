@@ -2,21 +2,21 @@
 
 @theme {
   /* Strawberry accent — warm, friendly, high-energy */
-  --color-accent:       oklch(61% 0.24 28);
-  --color-accent-hover: oklch(54% 0.24 28);
+  --color-accent:       oklch(61% 0.23 28);
+  --color-accent-hover: oklch(54% 0.22 28);
   --color-accent-light: oklch(97% 0.018 28);
 
   /* Light mode surfaces */
-  --color-background:   oklch(99.2% 0.002 250);
-  --color-surface:      oklch(100% 0 0);
-  --color-navy:         oklch(97.2% 0.003 250);
-  --color-navy-light:   oklch(98.4% 0.002 250);
-  --color-game-surface: oklch(96.5% 0.004 250);
+  --color-background:   oklch(98.8% 0.004 250);
+  --color-surface:      oklch(99.8% 0.002 250);
+  --color-navy:         oklch(96.8% 0.005 250);
+  --color-navy-light:   oklch(98.2% 0.004 250);
+  --color-game-surface: oklch(96% 0.006 250);
 
   /* Text & Borders */
-  --color-fg:           oklch(18% 0.006 250);
-  --color-muted:        oklch(48% 0.008 250);
-  --color-border:       oklch(91.5% 0.004 250);
+  --color-fg:           oklch(18% 0.008 250);
+  --color-muted:        oklch(48% 0.010 250);
+  --color-border:       oklch(90.5% 0.006 250);
 
   /* Typography */
   --font-sans: var(--font-nunito), "Nunito", sans-serif;
@@ -33,15 +33,17 @@
 /* ─── Dark mode overrides ─────────────────────────────────── */
 [data-theme="dark"] {
   color-scheme: dark;
-  --color-background:   oklch(13% 0.006 250);
-  --color-surface:      oklch(17% 0.008 250);
-  --color-navy:         oklch(19.5% 0.007 250);
-  --color-navy-light:   oklch(21.5% 0.007 250);
-  --color-game-surface: oklch(18% 0.007 250);
-  --color-fg:           oklch(93% 0.004 250);
-  --color-muted:        oklch(57% 0.008 250);
-  --color-border:       oklch(26% 0.012 250);
-  --color-accent-light: oklch(21% 0.04 28);
+  --color-background:   oklch(16% 0.012 250);
+  --color-surface:      oklch(20% 0.014 250);
+  --color-navy:         oklch(23% 0.016 250);
+  --color-navy-light:   oklch(25% 0.016 250);
+  --color-game-surface: oklch(18% 0.012 250);
+  --color-fg:           oklch(92% 0.006 250);
+  --color-muted:        oklch(66% 0.010 250);
+  --color-border:       oklch(30% 0.012 250);
+  --color-accent:       oklch(66% 0.20 28);
+  --color-accent-hover: oklch(70% 0.20 28);
+  --color-accent-light: oklch(25% 0.045 28);
 }
 
 /* Motion tokens */
@@ -69,6 +71,14 @@
 }
 .settings-panel {
   animation: settings-in 0.15s var(--ease-out-quart) both;
+}
+
+@keyframes drawer-in {
+  from { opacity: 0; transform: translateX(-18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.category-drawer {
+  animation: drawer-in 0.2s var(--ease-out-quart) both;
 }
 
 /* ─── Base ───────────────────────────────────────────────────── */
@@ -99,6 +109,49 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background: var(--color-background);
+}
+
+.home-pattern::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23e8581f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' opacity='0.24'%3E%3Cpath d='M28 48h22c8 0 14 6 14 14v8c0 8-6 14-14 14h-4c-5 0-8 2-11 6l-2 3c-1 2-4 2-5 0l-2-3c-3-4-6-6-11-6h-4C3 84-3 78-3 70v-8c0-8 6-14 14-14h17z'/%3E%3Cpath d='M17 66h15M25 58v16'/%3E%3Ccircle cx='45' cy='63' r='2.5'/%3E%3Ccircle cx='53' cy='70' r='2.5'/%3E%3Cpath d='M133 40l6 13 14 2-10 10 2 14-12-7-12 7 2-14-10-10 14-2 6-13z'/%3E%3Cpath d='M52 132h20l7 12-17 21-17-21 7-12zM45 144h34M62 165l-7-21M62 165l7-21'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  opacity: 0.72;
+}
+
+[data-theme="dark"] .home-pattern::before {
+  opacity: 0.26;
+}
+
+.theme-transition,
+.theme-transition body,
+.theme-transition body::before,
+.theme-transition header,
+.theme-transition aside,
+.theme-transition nav,
+.theme-transition main,
+.theme-transition footer,
+.theme-transition section,
+.theme-transition div,
+.theme-transition a,
+.theme-transition button,
+.theme-transition input,
+.theme-transition p,
+.theme-transition h1,
+.theme-transition h2,
+.theme-transition h3,
+.theme-transition span,
+.theme-transition svg {
+  transition:
+    background-color 220ms var(--ease-out-quart),
+    color 220ms var(--ease-out-quart),
+    border-color 220ms var(--ease-out-quart),
+    box-shadow 220ms var(--ease-out-quart),
+    fill 220ms var(--ease-out-quart),
+    stroke 220ms var(--ease-out-quart);
 }
 
 /* Scrollbar */
@@ -173,14 +226,21 @@ body::before {
 }
 
 .skeleton {
+  --sk-base:    oklch(95% 0.005 255);
+  --sk-shine:   oklch(91% 0.008 255);
   background: linear-gradient(
     90deg,
-    oklch(95% 0.005 255) 0%,
-    oklch(91% 0.008 255) 40%,
-    oklch(95% 0.005 255) 100%
+    var(--sk-base) 0%,
+    var(--sk-shine) 40%,
+    var(--sk-base) 100%
   );
   background-size: 200% 100%;
   animation: skeleton-sweep 1.6s var(--ease-out-quart) infinite;
+}
+
+[data-theme="dark"] .skeleton {
+  --sk-base:  oklch(21% 0.007 250);
+  --sk-shine: oklch(26% 0.010 250);
 }
 
 /* ─── Card entrance (stagger) ────────────────────────────────── */
@@ -200,6 +260,14 @@ body::before {
   animation-delay: var(--stagger, 0ms);
 }
 
+@keyframes featured-card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.featured-card-page {
+  animation: featured-card-in 0.22s var(--ease-out-quart) both;
+}
+
 /* ─── Overdrive: CSS scroll-driven reveal ── */
 /* ─── Horizontal strip scrollbar ────────────────────────────── */
 .scrollbar-hidden {
@@ -210,6 +278,10 @@ body::before {
 
 /* ─── Reduced motion ─────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+  .theme-transition,
+  .theme-transition * {
+    transition: none !important;
+  }
   .game-card,
   .game-card-thumb,
   .game-card-play {
@@ -218,8 +290,10 @@ body::before {
     animation: none !important;
   }
   .game-card:hover { transform: none !important; box-shadow: none !important; }
-  .skeleton        { animation: none; background: oklch(93% 0.005 255); }
+  .skeleton        { animation: none; background: var(--sk-base, oklch(93% 0.005 255)); }
   .card-enter      { animation: none; opacity: 1; transform: none; }
+  .featured-card-page { animation: none; opacity: 1; transform: none; }
+  .category-drawer { animation: none; opacity: 1; transform: none; }
 }
 
 /* ─── Playful Ambient Glows (Light Mode Pastel Halos) ─────────── */
@@ -282,6 +356,25 @@ body::before {
   opacity: 0.35;
 }
 
+.game-frame-shell:fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+}
+
+.game-frame-shell iframe {
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .game-frame-shell {
+    width: min(100%, calc((100dvh - 96px) * var(--game-aspect, 1.333))) !important;
+    max-height: calc(100dvh - 96px) !important;
+  }
+}
+
 /* Active touch/click state scale down */
 .active-click {
   transition: transform 100ms var(--ease-out-quart);
@@ -297,6 +390,7 @@ body::before {
 /* Poki-style dense grid — auto-fit + fixed cols + justify-content:center để last row luôn được căn giữa */
 .grid-poki {
   display: grid;
+  grid-auto-flow: dense;
   grid-template-columns: repeat(auto-fit, 130px);
   grid-auto-rows: 175px;
   justify-content: center;
@@ -320,6 +414,7 @@ body::before {
 /* Standard grid (category, games pages) — same centering approach */
 .grid-standard {
   display: grid;
+  grid-auto-flow: dense;
   grid-template-columns: repeat(auto-fit, 150px);
   grid-auto-rows: 200px;
   justify-content: center;

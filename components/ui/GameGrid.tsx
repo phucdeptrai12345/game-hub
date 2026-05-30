@@ -9,6 +9,8 @@ interface Props {
   spotlight?: boolean;
   showAds?: boolean;
   layout?: 'default' | 'poki';
+  showRank?: boolean;
+  rankStart?: number;
 }
 
 
@@ -26,13 +28,15 @@ export default function GameGrid({
   spotlight = true,
   showAds = false,
   layout = 'poki',
+  showRank = false,
+  rankStart = 1,
 }: Props) {
   if (games.length === 0) return null;
 
   const usePoki = layout === 'poki';
 
   // Inject ads at specific intervals inside the grid to maximize impressions
-  const items: ({ type: 'game'; data: Game } | { type: 'ad'; id: string } | { type: 'ghost'; id: string })[] = [];
+  const items: ({ type: 'game'; data: Game } | { type: 'ad'; id: string })[] = [];
   let adCount = 0;
 
   games.forEach((game, index) => {
@@ -64,10 +68,6 @@ export default function GameGrid({
           spanClass = 'col-span-2 row-span-2 md:col-span-2 md:row-span-2';
         }
 
-        if (item.type === 'ghost') {
-          return <div key={item.id} aria-hidden="true" />;
-        }
-
         if (item.type === 'ad') {
           const adVariant = variant === 'spotlight' ? 'wide' : 'default';
           return (
@@ -94,6 +94,7 @@ export default function GameGrid({
               game={item.data}
               priority={gameIndex < priorityCount}
               variant={cardVariant}
+              rank={showRank ? rankStart + gameIndex : undefined}
             />
           </div>
         );

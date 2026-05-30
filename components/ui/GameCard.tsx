@@ -9,9 +9,10 @@ interface Props {
   game: Game;
   priority?: boolean;
   variant?: 'default' | 'wide' | 'tall' | 'spotlight';
+  rank?: number;
 }
 
-export default function GameCard({ game, priority = false, variant = 'default' }: Props) {
+export default function GameCard({ game, priority = false, variant = 'default', rank }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
@@ -95,6 +96,12 @@ export default function GameCard({ game, priority = false, variant = 'default' }
             {game.title}
           </p>
         </div>
+
+        {rank !== undefined && (
+          <div className="absolute left-2 top-2 z-10 flex h-8 min-w-8 items-center justify-center rounded-lg bg-surface/95 px-2.5 text-base font-black leading-none text-accent shadow-[0_2px_8px_oklch(10%_0.01_250/0.18)]">
+            {rank}
+          </div>
+        )}
       </Link>
 
       {/* Spotlight star — outside overflow-hidden, half sticking out */}

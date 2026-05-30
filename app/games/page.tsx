@@ -1,4 +1,6 @@
-import { getAllGames } from '@/lib/gamemonetize';
+import { getMostPlayedGames, getNewestGames } from '@/lib/gamemonetize';
+import { getY8Games, Y8_CURATED_GAME_SLUGS } from '@/lib/y8';
+import type { Game } from '@/lib/types';
 import GameGrid from '@/components/ui/GameGrid';
 import Pagination from '@/components/ui/Pagination';
 import Link from 'next/link';
@@ -8,24 +10,78 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'All Games',
-  description: 'Browse hundreds of free HTML5 games. Filter by category, sort by newest or A-Z.',
+  description: 'Browse 3,000+ free HTML5 games. No download, no sign-up. Action, puzzle, racing, and more.',
 };
 
-const PAGE_SIZE = 250;
+const PAGE_SIZE = 200;
 
 interface Props {
-  searchParams: Promise<{ category?: string; sort?: string; page?: string }>;
+  searchParams: Promise<{ sort?: string; page?: string }>;
+}
+
+function dedup(list: Game[]): Game[] {
+  const seen = new Set<string>();
+  return list.filter((g) => (seen.has(g.slug) ? false : (seen.add(g.slug), true)));
+}
+
+// Interleave Y8 curated games (hand-picked list, ~every 4th slot) into a base list.
+// This surfaces iconic Y8 games (Slope, Vex, Moto X3M…) near the top
+// rather than burying them after 500 GM games.
+function interleaveY8Curated(base: Game[], y8All: Game[], interval = 4): Game[] {
+  const curated = y8All.filter((g) => Y8_CURATED_GAME_SLUGS.has(g.slug));
+  const extended = y8All.filter((g) => !Y8_CURATED_GAME_SLUGS.has(g.slug));
+
+  const result: Game[] = [];
+  const seen = new Set<string>();
+  let ci = 0;
+
+  for (let i = 0; i < base.length || ci < curated.length; i++) {
+    // Insert one curated Y8 game every `interval` slots
+    if (ci < curated.length && i > 0 && i % interval === 0) {
+      const g = curated[ci++];
+      if (!seen.has(g.slug)) { seen.add(g.slug); result.push(g); }
+    }
+    if (i < base.length) {
+      const g = base[i];
+      if (!seen.has(g.slug)) { seen.add(g.slug); result.push(g); }
+    }
+  }
+  // Flush remaining curated
+  for (; ci < curated.length; ci++) {
+    const g = curated[ci];
+    if (!seen.has(g.slug)) { seen.add(g.slug); result.push(g); }
+  }
+  // Append extended Y8 games at the end
+  for (const g of extended) {
+    if (!seen.has(g.slug)) { seen.add(g.slug); result.push(g); }
+  }
+  return result;
 }
 
 export default async function GamesPage({ searchParams }: Props) {
   const params = await searchParams;
-  const sort = params.sort ?? 'new';
+  const sort = params.sort ?? 'popular';
   const page = Math.max(1, parseInt(params.page ?? '1', 10));
 
-  let games = await getAllGames();
+  const [mostPlayed, newest, y8Games] = await Promise.all([
+    getMostPlayedGames(500),
+    getNewestGames(500),
+    getY8Games(),
+  ]);
 
-  if (sort === 'az') {
-    games = [...games].sort((a, b) => a.title.localeCompare(b.title));
+  let games: Game[];
+  if (sort === 'new') {
+    // GM newest API order first (genuinely new), then Y8, then remaining popular-only
+    const newestSlugs = new Set(newest.map((g) => g.slug));
+    games = dedup([...newest, ...y8Games, ...mostPlayed.filter((g) => !newestSlugs.has(g.slug))]);
+  } else if (sort === 'az') {
+    games = dedup([...mostPlayed, ...newest, ...y8Games]).sort((a, b) =>
+      a.title.localeCompare(b.title),
+    );
+  } else {
+    // popular: interleave Y8 curated into GM mostplayed (every 4th slot),
+    // then extended Y8 at the back
+    games = interleaveY8Curated([...mostPlayed, ...newest.filter(g => !mostPlayed.find(m => m.slug === g.slug))], y8Games, 4);
   }
 
   const totalPages = Math.ceil(games.length / PAGE_SIZE);
@@ -48,6 +104,7 @@ export default async function GamesPage({ searchParams }: Props) {
           <span className="text-xs font-bold text-muted uppercase tracking-widest hidden sm:inline">Sort</span>
           <div className="flex gap-1.5">
             {[
+              { value: 'popular', label: 'Popular' },
               { value: 'new', label: 'Newest' },
               { value: 'az', label: 'A–Z' },
             ].map((opt) => (

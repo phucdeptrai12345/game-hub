@@ -29,6 +29,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const toggleTheme = () => {
     const next: Theme = theme === 'light' ? 'dark' : 'light';
+    document.documentElement.classList.add('theme-transition');
     setTheme(next);
     localStorage.setItem('theme', next);
     if (next === 'dark') {
@@ -36,6 +37,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } else {
       document.documentElement.removeAttribute('data-theme');
     }
+    window.setTimeout(() => {
+      document.documentElement.classList.remove('theme-transition');
+    }, 260);
   };
 
   if (!mounted) return <>{children}</>;

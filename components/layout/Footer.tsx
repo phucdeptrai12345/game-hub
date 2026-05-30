@@ -32,7 +32,7 @@ export default function Footer() {
 
             <div className="space-y-4 text-muted text-base leading-loose font-semibold">
               <p>
-                GameZone is your ultimate destination for free online games. With over 500 carefully selected HTML5 games
+                GameZone is your ultimate destination for free online games. With hundreds of HTML5 games
                 spanning action, puzzle, racing, sports, shooting, adventure, strategy, and many more genres, there is
                 always something new and exciting to discover — no matter what kind of player you are.
               </p>
@@ -91,7 +91,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-border/60 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted/60 font-semibold">
           <p>© {new Date().getFullYear()} GameZone. All rights reserved.</p>
-          <p>500+ free games. No downloads. No sign-up.</p>
+          <p>3,000+ free games. No downloads. No sign-up.</p>
         </div>
 
       </div>
