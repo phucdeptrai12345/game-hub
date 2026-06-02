@@ -39,7 +39,7 @@ export default function PromoAd({
       <div className="relative z-10 flex h-full max-w-[210px] flex-col justify-between">
         <div>
           <span className="mb-3 inline-flex rounded-full border border-border/70 bg-surface/90 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-muted">
-            Sponsored
+            Picked for you
           </span>
           <p className="mb-1 text-xs font-black uppercase tracking-wide text-accent">{eyebrow}</p>
           <h3 className="text-xl font-black leading-tight text-fg title-display">{title}</h3>

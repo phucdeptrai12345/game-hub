@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-6">
+    <div className="w-full px-3 sm:px-4 lg:px-5 xl:px-6 py-6">
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-6">
 
         {/* Left: iframe area */}

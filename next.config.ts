@@ -13,12 +13,17 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '*.y8.com',
+        hostname: '**.famobi.com',
       },
       {
         protocol: 'https',
-        hostname: 'cdn2.y8.com',
+        hostname: '**.gamepix.com',
       },
+      {
+        protocol: 'https',
+        hostname: '**.gamedistribution.com',
+      },
+
     ],
     unoptimized: true,
   },

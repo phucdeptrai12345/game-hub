@@ -30,15 +30,6 @@ export default function AdCard({ variant = 'default' }: Props) {
           Sponsored
         </span>
 
-        {/* Play icon overlay on hover */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className={`game-card-play rounded-full bg-accent flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-all duration-300 ${isWide ? 'w-13 h-13' : 'w-11 h-11'}`}>
-            <svg width={isWide ? '16' : '14'} height={isWide ? '16' : '14'} viewBox="0 0 24 24" fill="white" aria-hidden="true" style={{ transform: 'translateX(1.5px)' }}>
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </div>
-        </div>
-
       </div>
 
       {/* Info cabinet below */}

@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-06-01T11:37:25.166Z",
+  "affiliateId": "A-FAMOBI-COM",
+  "verifyCdn": true,
+  "dryRun": false,
+  "totals": {
+    "before": 11357,
+    "nonFamobi": 10727,
+    "famobiBefore": 630,
+    "famobiChecked": 630,
+    "famobiPlayable": 630,
+    "famobiFailed": 0,
+    "famobiSkipped": 0,
+    "after": 11357
+  },
+  "failuresByReason": {},
+  "failed": []
+}

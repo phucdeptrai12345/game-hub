@@ -1,0 +1,177 @@
+{
+  "generatedAt": "2026-06-01T16:24:33.553Z",
+  "baseUrl": "http://localhost:3000",
+  "count": 24,
+  "seconds": 5,
+  "warmupSeconds": 8,
+  "size": {
+    "width": 640,
+    "height": 360
+  },
+  "success": 24,
+  "failed": 0,
+  "results": [
+    {
+      "ok": true,
+      "skipped": true,
+      "slug": "temple-blocks",
+      "previewVideo": "/previews/temple-blocks.webm"
+    },
+    {
+      "ok": true,
+      "skipped": true,
+      "slug": "babel-tower",
+      "previewVideo": "/previews/babel-tower.webm"
+    },
+    {
+      "ok": true,
+      "skipped": true,
+      "slug": "cut-the-rope-time-travel",
+      "previewVideo": "/previews/cut-the-rope-time-travel.webm"
+    },
+    {
+      "ok": true,
+      "skipped": true,
+      "slug": "island-puzzle",
+      "previewVideo": "/previews/island-puzzle.webm"
+    },
+    {
+      "ok": true,
+      "skipped": true,
+      "slug": "cut-the-rope-experiment",
+      "previewVideo": "/previews/cut-the-rope-experiment.webm"
+    },
+    {
+      "ok": true,
+      "skipped": true,
+      "slug": "model-wedding-girl-games",
+      "previewVideo": "/previews/model-wedding-girl-games.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "dye-hard",
+      "title": "Dye Hard",
+      "previewVideo": "/previews/dye-hard.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "glass-break",
+      "title": "Glass Break",
+      "previewVideo": "/previews/glass-break.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "my-ice-cream-shop",
+      "title": "My Ice Cream Shop",
+      "previewVideo": "/previews/my-ice-cream-shop.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "star-stars-arena",
+      "title": "Star Stars Arena",
+      "previewVideo": "/previews/star-stars-arena.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "night-city-racing",
+      "title": "Night City Racing",
+      "previewVideo": "/previews/night-city-racing.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "who-dies-last",
+      "title": "Who Dies Last",
+      "previewVideo": "/previews/who-dies-last.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "runaway-toad",
+      "title": "Runaway Toad",
+      "previewVideo": "/previews/runaway-toad.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "cut-the-rope-magic",
+      "title": "Cut The Rope Magic",
+      "previewVideo": "/previews/cut-the-rope-magic.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "roof-rails-color-stack-3d",
+      "title": "Roof Rails - Color Stack 3D",
+      "previewVideo": "/previews/roof-rails-color-stack-3d.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "bouncemasters",
+      "title": "Bouncemasters",
+      "previewVideo": "/previews/bouncemasters.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "jelly-run-2048",
+      "title": "Jelly Run 2048",
+      "previewVideo": "/previews/jelly-run-2048.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "squid-game-3d-survival-squad",
+      "title": "Squid Game 3D Survival Squad",
+      "previewVideo": "/previews/squid-game-3d-survival-squad.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "cars-arena",
+      "title": "Cars Arena",
+      "previewVideo": "/previews/cars-arena.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "superstar-family-dress-up-game",
+      "title": "Superstar Family Dress Up Game",
+      "previewVideo": "/previews/superstar-family-dress-up-game.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "state-connect",
+      "title": "State Connect",
+      "previewVideo": "/previews/state-connect.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "among-us-space-rush",
+      "title": "Among Us Space Rush",
+      "previewVideo": "/previews/among-us-space-rush.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "teeth-runner",
+      "title": "Teeth Runner",
+      "previewVideo": "/previews/teeth-runner.webm"
+    },
+    {
+      "ok": true,
+      "skipped": false,
+      "slug": "supermarket-expert-idle",
+      "title": "Supermarket Expert Idle",
+      "previewVideo": "/previews/supermarket-expert-idle.webm"
+    }
+  ]
+}

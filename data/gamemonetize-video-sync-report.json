@@ -1,0 +1,607 @@
+{
+  "checked": 5071,
+  "updated": 4128,
+  "failed": 943,
+  "failures": [
+    {
+      "id": "gamemonetize:2456",
+      "title": "Baldi's Basics v1.4.3",
+      "token": "iiifrxhcnzl5laslqf3eaedtevjzb2bu",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:1214",
+      "title": "Stickman Gun Shooter 3D",
+      "token": "55uewxpgw5fg83ahhosllieq3819vzw0",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:4996",
+      "title": "LadyBug Jigsaw Puzzle Collection",
+      "token": "07cyslhfnl55xgtrteakwxg366q2rg5s",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:5023",
+      "title": "Fall Bros",
+      "token": "vnvpo9h7zc6phugavlw7xni2thz4no4i",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:8831",
+      "title": "Super Santa Adventures",
+      "token": "k0agpaxphd0vrr5h22af8hoci606yejj",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:25203",
+      "title": "Temple Run 2: Jungle Fall",
+      "token": "pkrsuit51ypgzm64h6ohkjnqvwv1zabz",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:9311",
+      "title": "Crazy GTA Mercenary Driver",
+      "token": "ms6hpyknf5j9xmghxznncws9b8eee2n0",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:1045",
+      "title": "Mine-Craft.io",
+      "token": "i004avdmt9jezvey9tjvuzv9h1l2e9kx",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:34975",
+      "title": "Bandits Bane",
+      "token": "121weei0mlhtn5fkft56wqjkov7md493",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:5826",
+      "title": "Get On Top Touch",
+      "token": "ilnafv1nkh5b0qwxgiy8wv4haz2fy3fg",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:5811",
+      "title": "Siren Head SCP-6789: The Hunt Continues",
+      "token": "qvk82anhipglicd9u9lbsppw3psyzwyq",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:2173",
+      "title": "Minecraft Remake",
+      "token": "cznxajp3hzb8l7gtebaq96s0pbrfa33m",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:13076",
+      "title": "Good Guys vs Among Us",
+      "token": "ylcyhgqcukiq50itj63cx1dkkm1vstwq",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:9314",
+      "title": "Super Fox World Jungle Adventure Run",
+      "token": "do698p9zktxn76rmlyqoq6jbff3o8aml",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:6234",
+      "title": "Fireboy Watergirl Island Survival 3",
+      "token": "2tlcz2gaua43ul01tg2qybhv57h9b94d",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:592",
+      "title": "Relic Runway",
+      "token": "ralnzjj3b624rjg6a31vl3m7tz7p8tf0",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:6564",
+      "title": "Temple Run 2",
+      "token": "pkyyuilfrqkcdnmrxsg60j22ypk0peje",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:1243",
+      "title": "Warfare Area",
+      "token": "3fnk3e4rstcjsqolnpx158fe8ptp74eb",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:1016",
+      "title": "SlitherCraft.io",
+      "token": "evckpufpla0xoqwf0ihlwvxy3pc04dzi",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:24363",
+      "title": "CrazySteve.io",
+      "token": "uqzbzhkjckdjj96mn9sm0mcyoz68tagn",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:5035",
+      "title": "MiniBattles - 2 3 4 5 6 Player Games",
+      "token": "mmnt2jke3n89685w28bd4pzjf3looxob",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36957",
+      "title": "SliceStorm",
+      "token": "1hwhdlx3ryyql1pi7w43z2wce5t3rcjc",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:1684",
+      "title": "Fireboy and Watergirl 6",
+      "token": "cym6sfm8kebf73562van2bwa2tdz4prh",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:10315",
+      "title": "DoodleCube.io",
+      "token": "dqnmpu04uxw4d6zfg0a0fzolrvvdh7ou",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:35847",
+      "title": "Brain Test: IQ Challenge",
+      "token": "893dmia83svuj6rwn19tx03ubpe32a9o",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:5480",
+      "title": "Amongus Escape",
+      "token": "8531byjxglyfqtzzhozfv2b2aywyaiyi",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:1097",
+      "title": "Crazynite.io",
+      "token": "zlmz9xiuo5s5dntkcmx2cw2vvto5ox0o",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:1047",
+      "title": "Super Onion Boy",
+      "token": "jtnau6xam3feocnkwi3xn5i4qc0l1kpk",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:98",
+      "title": "Subway Clash 3D",
+      "token": "nduhdua0yup2i0k4llj5wjplk62np2md",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:7730",
+      "title": "Perfect Food Slices – Cut the Food & Fruit Slash",
+      "token": "ismy4ejx8256xpru4rho0bdeppheu23d",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37030",
+      "title": "Girl Explorer: Jigsaw Puzzles",
+      "token": "h3dh8itd30fsjhu1a3jt3lgblx3wfo9u",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:2936",
+      "title": "CoronaVirus19",
+      "token": "oajr2x9fx08a83nc80g1t7pvqfx2t7eh",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:6379",
+      "title": "MineWorld Horror The Mansion",
+      "token": "yc923to72qh15v21njybw4l29c51p1xn",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36133",
+      "title": "Space Destroyer",
+      "token": "f0ss8d5zkmddjjrgz0xrci27ko15kd6h",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:10373",
+      "title": "Maritime Sniper",
+      "token": "eixq9hven9curv50dromq9ma2oggllnz",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:2991",
+      "title": "Super Rocket Buddy",
+      "token": "unyq7wdvi2bfsowowi91obhn48m9kuje",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:5292",
+      "title": "Assault Zone",
+      "token": "ds7741peizaztqjr44x1onvt6vy4m25z",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:3636",
+      "title": "Ronaldo Kick Run",
+      "token": "nfi0vtpni37e0u6q9ypi10ramfa58lgv",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:9155",
+      "title": "Chinese Street Food Maker",
+      "token": "vxg0o0g1r4v9sh2nat6ad2nmx3it7tb2",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:7436",
+      "title": "Car Sky Stunts",
+      "token": "6j443v54wxyxzg4ol0mlqqej0p0fzwn6",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:9152",
+      "title": "Cotton Candy Maker",
+      "token": "zrkjdjpepbpkblawnhdcygcfqomaddyc",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:9154",
+      "title": "Chef City : Kitchen Restaurant Cooking Game",
+      "token": "uhrgsgi9lvx7w5gg3663xqxbgboolujg",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:9432",
+      "title": "granny chapter2",
+      "token": "gaap24az0344i5y9s9xuleh79xldvv6b",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:8589",
+      "title": "Burger Master Shop",
+      "token": "pzwdhs9i597a4n27nr0rne4ake2jibb8",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:9144",
+      "title": "Cooking Chinese Food - Chef Cook Asian Cooking",
+      "token": "vnobfdkvoaoboct04f83h4td1p6hxgpt",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:27113",
+      "title": "Aquapark Shark",
+      "token": "tll0a54tsmdg7bmzvkm8pi0abrfrhwrp",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:15030",
+      "title": "Hulk Smash Breaker wall",
+      "token": "6e72e041n8nq1biykx2m0ywjte2so8nu",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:5191",
+      "title": "Fall Boys : Ultimate Knockout",
+      "token": "fl2h230rbpfll1yipdj8xcewg0p0hm0x",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:12774",
+      "title": "Mega Ramp Car Racing Stunt Free New Car Games 2021",
+      "token": "y600sea2734f5aeg57kw25nzx3czxuyv",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:2435",
+      "title": "Shrek.fun",
+      "token": "q1r7xhak8npz6jo8x73jnd1rd9z2zxfq",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:7489",
+      "title": "Passenger Bus Taxi Driving Simulator",
+      "token": "kjl5l3253irx593muax2476q8u01616r",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:5925",
+      "title": "Micro Tanks",
+      "token": "91us20ikzsyi3g9ptlvhd44gueoc2ncb",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:7833",
+      "title": "Stickman Warriors - Super Dragon Shadow Fight",
+      "token": "ugwk0rt7ei2auezxqyj44xx3nrgzpcmj",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37035",
+      "title": "Sniper Shooting Game",
+      "token": "bordkcb0sx5wuh4gd7le2h1i4ih2msmi",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37047",
+      "title": "Nexusorbiter",
+      "token": "0etcllezum2v9nl4hc3syd7rlp600x3w",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37051",
+      "title": "Zombie swarm",
+      "token": "jgbxplcymt6ccgoo4j724csv030uthxd",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37041",
+      "title": "House Paint Challenge",
+      "token": "d5yymum1ygbx4ft8az81lg4ogpdbsno5",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:7808",
+      "title": "Dragon Ball Stickman Z",
+      "token": "jboag0pr5qal6wwdjow22ixsmqy9ymoi",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37014",
+      "title": "Monster Truck Offroad",
+      "token": "a3jgsz6mwp6ygkkc79pga3s4k9st3i43",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37009",
+      "title": "Car Stunt Racing Stylized",
+      "token": "wc1jkzey2mu15um074zx1mgujcp2nc8l",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37021",
+      "title": "Car Chasing",
+      "token": "48npnes12qonl33ssaya3866khs9gt98",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37039",
+      "title": "Alphabet Mahjong",
+      "token": "blmge6fwfpytpcmx7gygprx9arxft009",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:9592",
+      "title": "Stickman Rope Hook",
+      "token": "5e84vl1yt3qt1gy57p432a8uos5522o7",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37050",
+      "title": "Resource Empire",
+      "token": "suh0t5ba29tw7m38daqzscuhfspi93e1",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36990",
+      "title": "Crime Wars San Andreas",
+      "token": "zgkpu22p8qekzct8z4b95lv69rh6s58c",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37008",
+      "title": "Gunship Strike Helicopter Game",
+      "token": "r3lsomv35849vk879eck7rph9zdhydk4",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36934",
+      "title": "ASMR Fun Relaxing Games",
+      "token": "r1qsqkv2hkdt1jmt8030qfxbjvhqf9ui",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36974",
+      "title": "Neck Stack Rush",
+      "token": "da91ozg3wbzs01514505puzfnmw0zl62",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37049",
+      "title": "SUPER SAVING FOOTBALL",
+      "token": "ldwjgalpmfkuoqpgt93yws5lns4n8ky8",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36707",
+      "title": "Ben 5 Difference",
+      "token": "slx736tf43rytdrugby3m2mz3qg4ndah",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:35410",
+      "title": "ICE DASH",
+      "token": "k77rpabre5am7bilq0zsjld6fv8zussk",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36981",
+      "title": "ASMR Cat Doctor Clinic",
+      "token": "qfpr226dj5yd9ayrll38hjesj3b6ymsa",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37052",
+      "title": "Crazy Moto",
+      "token": "s74g69865ye0ps8z2bvoc4cyu7r5iock",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36999",
+      "title": "Bike Stunt Game",
+      "token": "rvu226yu1yfb6bwg5bzr927lxo1rdeea",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:10932",
+      "title": "FNAF piano tiles",
+      "token": "t0zn7b0ekbzutts01kemoqtzvg8dqodk",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:11323",
+      "title": "Chinese Food Restaurant - Lunar New Year Party",
+      "token": "mbijz2zu0c5yct2cr12x8sr2n7xqqy8d",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:26122",
+      "title": "Bazooka Boy",
+      "token": "l49nc9nx18duefbvq4muqyrskeytis34",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36975",
+      "title": "Triple Car Jam",
+      "token": "entlpcg6ar9dpg23gi130rxdom4tu0op",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36921",
+      "title": "Pets Roll: Clicker",
+      "token": "2x1nh843mxf6di9nqxbew3888elcwauo",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36956",
+      "title": "Battle of the Minds",
+      "token": "exixzssmyx10a506n8o5og5yo8ahwlc3",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:6967",
+      "title": "Infinite Stairs Online",
+      "token": "uq1tpsyrgnk54dblhtso34oh3y12tjfn",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36899",
+      "title": "3D Formula Racing: Pro Edition",
+      "token": "mjx3ypd72a172xmeqabjl8dt6w0ehip3",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:1704",
+      "title": "StickMan Team Force",
+      "token": "wdwndlx5wn7lyptgc8hck6drcfte2miz",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36896",
+      "title": "Outbreak Ops",
+      "token": "h8tqlnll0m80exyi5l7q8eggc2p8zkyc",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36980",
+      "title": "Water Flow Happy Glass",
+      "token": "rmkn63s02xxxhx6c2rj62h1r2ng7zp8r",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36880",
+      "title": "High School Teacher Games Life",
+      "token": "po9675gqlvgjf77th9gbz32f734228bw",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36889",
+      "title": "Kick a Lucky Block: Tsunami Football",
+      "token": "w0niw3a0zkklmu5tblmf8t78me8hrk8g",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36941",
+      "title": "Family Simulator Beach Games",
+      "token": "1hpowgwk3uxjiayl7igg1ie4v0np7b8f",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36863",
+      "title": "Be a Lucky Block: Boss Fight",
+      "token": "f6az74vkw6znz7jy511o6ri3a00lhs6h",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36987",
+      "title": "Zombie Grave Yard",
+      "token": "5k1yi3sk6s1oc2walu3po2ujxylbvjb6",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:37032",
+      "title": "Good Sorting Puzzle Game",
+      "token": "swrwfm3bfntgiwmx3sz9zubj31pc2eh0",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36833",
+      "title": "Target Hit Shooting Range",
+      "token": "05h15r7x12df5159m9aj9jdf5074vmqm",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36857",
+      "title": "Everwild Survival",
+      "token": "2osk4mum0lsigrs67otegocvw2vp1k5m",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36841",
+      "title": "Crack n Pop",
+      "token": "qf9fqdytwfb3git3dbu02gehc7vhn533",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:811",
+      "title": "Motor Bike Pizza Delivery 2020",
+      "token": "p8zsnghay6d6eo2bj7ow6tev1amm1kkr",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36965",
+      "title": "Line Runners",
+      "token": "hz79oxukxeh58p3pzohr6jwiq2uy8iff",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36829",
+      "title": "Tanks Of Liberty online",
+      "token": "qe9p21hpsfsvgkdom3s2zpuzqmjqrpdb",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36989",
+      "title": "The Forest Friends",
+      "token": "72wz3tk3ps63d57cffzh9apgndznugkm",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:36842",
+      "title": "BallBlastPals",
+      "token": "g0n669k6fop72px1gdevdwe46de6x0n3",
+      "error": "video id mismatch"
+    },
+    {
+      "id": "gamemonetize:9234",
+      "title": "My Ice Cream Truck",
+      "token": "uu38fdxtw93uf4tlthrt4ckng65tp7ck",
+      "error": "video id mismatch"
+    }
+  ]
+}

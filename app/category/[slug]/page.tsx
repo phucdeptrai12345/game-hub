@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import { getGamesByCategory } from '@/lib/gamemonetize';
-import { getY8GamesByCategory } from '@/lib/y8';
 import { getCategoryBySlug, CATEGORIES } from '@/constants/categories';
 import GameGrid from '@/components/ui/GameGrid';
 import Pagination from '@/components/ui/Pagination';
@@ -13,7 +12,7 @@ const PAGE_SIZE = 120;
 
 interface Props {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; sort?: string }>;
 }
 
 const categoryContent: Record<string, { intro: string; body: string[]; tip: string }> = {
@@ -210,30 +209,59 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const sp = await searchParams;
   const page = Math.max(1, parseInt(sp.page ?? '1', 10));
+  const sort = sp.sort ?? 'popular';
 
   const cat = getCategoryBySlug(slug);
   if (!cat) notFound();
 
-  const [gmGames, y8Games] = await Promise.all([
-    getGamesByCategory(cat.name),
-    getY8GamesByCategory(cat.slug),
-  ]);
-  // Y8 games first (more varied / recognizable), then GameMonetize
-  const games = [...y8Games, ...gmGames];
-  const totalPages = Math.ceil(games.length / PAGE_SIZE);
-  const paged = games.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const rawGames = await getGamesByCategory(cat.name);
+
+  const sorted = sort === 'az'
+    ? [...rawGames].sort((a, b) => a.title.localeCompare(b.title))
+    : sort === 'new'
+    ? [...rawGames].reverse()
+    : rawGames;
+
+  const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
+  const paged = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const content = getCategoryContent(slug);
 
-  return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-10">
+  const SORT_OPTS = [
+    { value: 'popular', label: 'Popular' },
+    { value: 'new',     label: 'Newest'  },
+    { value: 'az',      label: 'A–Z'     },
+  ];
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-fg title-display uppercase tracking-tight">
-          {cat.name} Games
-        </h1>
-        <p className="text-muted font-semibold text-sm mt-1">
-          {games.length.toLocaleString()} games
-        </p>
+  return (
+    <div className="w-full px-3 sm:px-4 lg:px-5 xl:px-6 py-8">
+
+      {/* Header */}
+      <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-black text-fg title-display uppercase tracking-tight">
+            {cat.name} Games
+          </h1>
+          <p className="text-muted font-semibold text-sm mt-1.5 max-w-lg">
+            {cat.description} — {rawGames.length.toLocaleString()} free games
+          </p>
+        </div>
+
+        {/* Sort buttons */}
+        <div className="flex w-full flex-wrap items-center gap-1.5 sm:mt-1 sm:w-auto sm:shrink-0">
+          {SORT_OPTS.map((opt) => (
+            <Link
+              key={opt.value}
+              href={`/category/${slug}?sort=${opt.value}`}
+              className={`flex-1 rounded-full px-3 py-2 text-center text-xs font-bold transition-colors duration-150 sm:flex-none ${
+                sort === opt.value
+                  ? 'bg-accent text-white'
+                  : 'bg-surface border border-border text-fg hover:bg-accent/10'
+              }`}
+            >
+              {opt.label}
+            </Link>
+          ))}
+        </div>
       </div>
 
       {paged.length > 0 ? (

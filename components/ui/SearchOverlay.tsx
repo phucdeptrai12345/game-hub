@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { CATEGORIES } from '@/constants/categories';
+import { useRouter } from 'next/navigation';
+import GameImage from '@/components/ui/GameImage';
+import SearchCategoryScroller from '@/components/ui/SearchCategoryScroller';
 import type { Game } from '@/lib/types';
 
 interface Props {
@@ -12,7 +13,6 @@ interface Props {
 }
 
 function MiniCard({ game, onClose }: { game: Game; onClose: () => void }) {
-  const [imgErr, setImgErr] = useState(false);
   return (
     <Link
       href={`/games/${game.slug}`}
@@ -20,21 +20,14 @@ function MiniCard({ game, onClose }: { game: Game; onClose: () => void }) {
       className="group flex flex-col gap-1.5 active-click"
     >
       <div className="relative aspect-square rounded-xl overflow-hidden bg-navy border border-border/60">
-        {!imgErr ? (
-          <Image
-            src={game.thumb}
-            alt=""
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-200"
-            sizes="100px"
-            unoptimized
-            onError={() => setImgErr(true)}
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-2xl">
-            🎮
-          </div>
-        )}
+        <GameImage
+          game={game}
+          alt=""
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-200"
+          fallbackClassName="text-xs"
+          sizes="100px"
+        />
       </div>
       <p className="text-[15px] font-bold text-fg line-clamp-1 group-hover:text-accent transition-colors duration-150 leading-tight">
         {game.title}
@@ -57,6 +50,7 @@ function SkeletonGrid() {
 }
 
 export default function SearchOverlay({ isOpen, onClose }: Props) {
+  const router = useRouter();
   const [query, setQuery] = useState('');
   const [popularGames, setPopularGames] = useState<Game[]>([]);
   const [newGames, setNewGames] = useState<Game[]>([]);
@@ -64,22 +58,6 @@ export default function SearchOverlay({ isOpen, onClose }: Props) {
   const [searching, setSearching] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const catScrollRef = useRef<HTMLDivElement>(null);
-  const catDragRef = useRef({ active: false, startX: 0, scrollLeft: 0 });
-
-  const onCatMouseDown = (e: React.MouseEvent) => {
-    const el = catScrollRef.current;
-    if (!el) return;
-    catDragRef.current = { active: true, startX: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft };
-  };
-  const onCatMouseMove = (e: React.MouseEvent) => {
-    const d = catDragRef.current;
-    const el = catScrollRef.current;
-    if (!d.active || !el) return;
-    e.preventDefault();
-    el.scrollLeft = d.scrollLeft - (e.pageX - el.offsetLeft - d.startX) * 1.5;
-  };
-  const onCatMouseUp = () => { catDragRef.current.active = false; };
 
   // Load popular + new on first open
   useEffect(() => {
@@ -115,17 +93,38 @@ export default function SearchOverlay({ isOpen, onClose }: Props) {
 
   // Debounced search
   useEffect(() => {
-    if (!query.trim()) { setSearchResults([]); return; }
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setSearchResults([]);
+      setSearching(false);
+      return;
+    }
+
+    const controller = new AbortController();
     const id = setTimeout(async () => {
       setSearching(true);
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`);
-        setSearchResults(await res.json());
+        const res = await fetch(`/api/search?q=${encodeURIComponent(trimmed)}`, {
+          signal: controller.signal,
+        });
+        if (!res.ok) {
+          setSearchResults([]);
+          return;
+        }
+        const data = await res.json();
+        setSearchResults(Array.isArray(data) ? data : []);
+      } catch (error) {
+        if ((error as DOMException).name !== 'AbortError') {
+          setSearchResults([]);
+        }
       } finally {
-        setSearching(false);
+        if (!controller.signal.aborted) setSearching(false);
       }
     }, 280);
-    return () => clearTimeout(id);
+    return () => {
+      controller.abort();
+      clearTimeout(id);
+    };
   }, [query]);
 
   if (!isOpen) return null;
@@ -160,6 +159,12 @@ export default function SearchOverlay({ isOpen, onClose }: Props) {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter' || !query.trim()) return;
+                  e.preventDefault();
+                  router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+                  onClose();
+                }}
                 placeholder="Search games..."
                 aria-label="Search games"
                 className="flex-1 text-base sm:text-lg font-bold bg-transparent text-fg placeholder-muted outline-none min-w-0"
@@ -207,30 +212,12 @@ export default function SearchOverlay({ isOpen, onClose }: Props) {
             /* ── Default: categories + popular + new ── */
             <>
               {/* Categories — edge-to-edge, draggable */}
-              <section className="mb-8 -mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-12">
-                <div
-                  ref={catScrollRef}
-                  onMouseDown={onCatMouseDown}
-                  onMouseMove={onCatMouseMove}
-                  onMouseUp={onCatMouseUp}
-                  onMouseLeave={onCatMouseUp}
-                  className="flex items-center gap-2 overflow-x-auto scrollbar-hidden py-1 px-4 sm:px-6 cursor-grab active:cursor-grabbing select-none"
-                >
-                  {CATEGORIES.map((cat) => (
-                    <Link
-                      key={cat.slug}
-                      href={`/category/${cat.slug}`}
-                      onClick={onClose}
-                      className="shrink-0 px-4 py-2 rounded-full text-sm font-bold bg-navy border border-border hover:bg-accent-light hover:text-accent hover:border-accent/30 text-fg transition-all duration-150 active-click whitespace-nowrap"
-                    >
-                      {cat.name}
-                    </Link>
-                  ))}
-                </div>
+              <section className="mb-6 -mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-12">
+                <SearchCategoryScroller onNavigate={onClose} />
               </section>
 
               {/* Popular */}
-              <section className="mb-8">
+              <section className="mb-6">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="w-1.5 h-6 rounded-full bg-accent" aria-hidden="true" />
                   <h2 className="text-xl font-black text-fg title-display uppercase tracking-tight">

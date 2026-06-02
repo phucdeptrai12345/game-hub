@@ -11,6 +11,8 @@ interface Props {
   layout?: 'default' | 'poki';
   showRank?: boolean;
   rankStart?: number;
+  badge?: 'new' | 'hot';
+  badgeCount?: number;
 }
 
 
@@ -30,6 +32,8 @@ export default function GameGrid({
   layout = 'poki',
   showRank = false,
   rankStart = 1,
+  badge,
+  badgeCount = 30,
 }: Props) {
   if (games.length === 0) return null;
 
@@ -95,6 +99,7 @@ export default function GameGrid({
               priority={gameIndex < priorityCount}
               variant={cardVariant}
               rank={showRank ? rankStart + gameIndex : undefined}
+              badge={badge && gameIndex < badgeCount ? badge : undefined}
             />
           </div>
         );

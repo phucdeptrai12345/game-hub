@@ -5,6 +5,9 @@ import type { CSSProperties } from 'react';
 import { Game } from '@/lib/types';
 import { CATEGORIES } from '@/constants/categories';
 import { slugify } from '@/lib/utils';
+import { readStoredGames, writeStoredGames } from '@/lib/stored-games';
+
+const FAVORITES_KEY = 'gz-favs';
 
 interface Props {
   game: Game;
@@ -14,7 +17,7 @@ export default function GameIframe({ game }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [iframeScale, setIframeScale] = useState(1);
+  const [isFav, setIsFav] = useState(false);
 
   const rawW = parseInt(game.width || '800', 10);
   const rawH = parseInt(game.height || '600', 10);
@@ -23,19 +26,32 @@ export default function GameIframe({ game }: Props) {
   const frameW = safeW;
   const frameH = safeH;
   const aspectRatio = frameW / frameH;
-  // Use 16:9 as minimum for landscape games so we never clip wider content
-  // (e.g. Y8 games stored as 4:3 but actually rendered 16:9 in the embed).
-  // Any narrower game (4:3, 3:2) gets letterboxed — container bg is black so
-  // it looks like cinema bars, not broken layout.
+  // Use 16:9 as minimum for landscape games; narrower games get letterboxed.
   const displayAspectRatio = aspectRatio >= 1 ? Math.max(aspectRatio, 16 / 9) : (aspectRatio > 0 ? aspectRatio : 4 / 3);
-  const isExternalEmbed = /^https?:\/\//i.test(game.url);
-  const cropEmbedChrome = isExternalEmbed;
-  const renderW = Math.max(frameW, displayAspectRatio >= 1 ? 960 : 540);
-  const renderCanvasH = Math.round(renderW / displayAspectRatio);
-  const chromeBottom = cropEmbedChrome
-    ? Math.round(Math.min(aspectRatio >= 1 ? 100 : 56, renderCanvasH * 0.15))
-    : 0;
-  const renderH = renderCanvasH + chromeBottom;
+  const frameSrc =
+    game.provider === 'famobi' && game.sourceId
+      ? `/api/famobi-frame/${encodeURIComponent(game.sourceId)}`
+      : game.url;
+  const sandboxPermissions = [
+    'allow-scripts',
+    'allow-same-origin',
+    'allow-forms',
+    'allow-modals',
+    'allow-popups',
+    'allow-popups-to-escape-sandbox',
+    'allow-pointer-lock',
+    'allow-presentation',
+    'allow-downloads',
+    'allow-storage-access-by-user-activation',
+  ].filter(Boolean).join(' ');
+
+  useEffect(() => {
+    setIsLoaded(false);
+  }, [frameSrc]);
+
+  useEffect(() => {
+    setIsFav(readStoredGames(FAVORITES_KEY).some((storedGame) => storedGame.id === game.id));
+  }, [game.id]);
 
   useEffect(() => {
     function onFsChange() {
@@ -54,27 +70,14 @@ export default function GameIframe({ game }: Props) {
     }
   }
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container || !Number.isFinite(renderW) || !Number.isFinite(renderH)) return;
-    const frame = container;
-
-    function syncScale() {
-      const rect = frame.getBoundingClientRect();
-      const nextScale = Math.min(rect.width / renderW, rect.height / renderCanvasH);
-      setIframeScale(Number.isFinite(nextScale) && nextScale > 0 ? nextScale : 1);
-    }
-
-    syncScale();
-    const observer = new ResizeObserver(syncScale);
-    observer.observe(frame);
-    window.addEventListener('resize', syncScale);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', syncScale);
-    };
-  }, [renderW, renderCanvasH]);
+  function toggleFavorite() {
+    try {
+      const favs = readStoredGames(FAVORITES_KEY);
+      const next = isFav ? favs.filter((storedGame) => storedGame.id !== game.id) : [game, ...favs];
+      writeStoredGames(FAVORITES_KEY, next);
+      setIsFav(!isFav);
+    } catch {}
+  }
 
   // Match category color for ambient glow tinting
   const cat = CATEGORIES.find((c) => c.slug === slugify(game.category));
@@ -97,8 +100,8 @@ export default function GameIframe({ game }: Props) {
         style={{
           aspectRatio: `${displayAspectRatio}`,
           '--game-aspect': displayAspectRatio,
-          width: `min(100%, calc((100dvh - 112px) * ${displayAspectRatio}))`,
-          maxHeight: 'calc(100dvh - 112px)',
+          width: `min(96%, calc((100dvh - 148px) * ${displayAspectRatio}))`,
+          maxHeight: 'calc(100dvh - 148px)',
           backgroundColor: '#000',
         } as CSSProperties}
       >
@@ -113,18 +116,15 @@ export default function GameIframe({ game }: Props) {
         )}
 
         <iframe
-          src={game.url}
+          key={frameSrc}
+          src={frameSrc}
           title={game.title}
           allowFullScreen
           allow="autoplay *; fullscreen *; gamepad *; accelerometer *; gyroscope *"
+          sandbox={sandboxPermissions}
           scrolling="no"
-          className="absolute left-1/2 top-0 border-0"
-          style={{
-            width: `${renderW}px`,
-            height: `${renderH}px`,
-            transform: `translateX(-50%) scale(${iframeScale})`,
-            transformOrigin: 'top center',
-          }}
+          referrerPolicy={game.provider === 'famobi' ? 'origin' : undefined}
+          className="absolute inset-0 h-full w-full border-0"
           loading="lazy"
           onLoad={() => setIsLoaded(true)}
         />
@@ -132,22 +132,37 @@ export default function GameIframe({ game }: Props) {
         {/* Scanlines overlay on iframe for high-tech cabinet look */}
         <div className="absolute inset-0 scanlines opacity-[0.04] pointer-events-none" />
 
-        <button
-          onClick={toggleFullscreen}
-          className="absolute bottom-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-lg bg-black/45 text-white backdrop-blur-sm transition-colors duration-150 hover:bg-accent active-click"
-          aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-          title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
-        >
-          {isFullscreen ? (
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 9V4.5M9 9H4.5M9 15v4.5M9 15H4.5M15 9h4.5M15 9V4.5M15 15h4.5M15 15v4.5" />
+        <div className="absolute bottom-3 right-3 z-10 flex items-center gap-2">
+          <button
+            onClick={toggleFavorite}
+            className={`flex h-9 w-9 items-center justify-center rounded-lg text-white backdrop-blur-sm transition-colors duration-150 active-click ${
+              isFav ? 'bg-red-500 hover:bg-red-600' : 'bg-black/45 hover:bg-accent'
+            }`}
+            aria-label={isFav ? 'Remove from favorites' : 'Add to favorites'}
+            title={isFav ? 'Remove favorite' : 'Add favorite'}
+          >
+            <svg className="h-4 w-4" fill={isFav ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.3} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 0 1 6.364 0L12 7.636l1.318-1.318a4.5 4.5 0 0 1 6.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 0 1 0-6.364z" />
             </svg>
-          ) : (
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
-            </svg>
-          )}
-        </button>
+          </button>
+
+          <button
+            onClick={toggleFullscreen}
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-black/45 text-white backdrop-blur-sm transition-colors duration-150 hover:bg-accent active-click"
+            aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+            title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+          >
+            {isFullscreen ? (
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 9V4.5M9 9H4.5M9 15v4.5M9 15H4.5M15 9h4.5M15 9V4.5M15 15h4.5M15 15v4.5" />
+              </svg>
+            ) : (
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
