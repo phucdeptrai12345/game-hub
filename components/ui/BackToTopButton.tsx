@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 const SHOW_AFTER_PX = 520;
 
 export default function BackToTopButton() {
+  const { t } = useI18n();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -38,7 +40,7 @@ export default function BackToTopButton() {
   return (
     <button
       type="button"
-      aria-label="Back to top"
+      aria-label={t('common.backToTop')}
       onClick={scrollToTop}
       className={`back-to-top-button active-click ${visible ? 'back-to-top-button-visible' : ''}`}
     >

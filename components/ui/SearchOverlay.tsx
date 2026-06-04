@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import GameImage from '@/components/ui/GameImage';
 import SearchCategoryScroller from '@/components/ui/SearchCategoryScroller';
 import type { Game } from '@/lib/types';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 interface Props {
   isOpen: boolean;
@@ -51,6 +52,7 @@ function SkeletonGrid() {
 
 export default function SearchOverlay({ isOpen, onClose }: Props) {
   const router = useRouter();
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [popularGames, setPopularGames] = useState<Game[]>([]);
   const [newGames, setNewGames] = useState<Game[]>([]);
@@ -165,8 +167,8 @@ export default function SearchOverlay({ isOpen, onClose }: Props) {
                   router.push(`/search?q=${encodeURIComponent(query.trim())}`);
                   onClose();
                 }}
-                placeholder="Search games..."
-                aria-label="Search games"
+                placeholder={t('search.overlayPlaceholder')}
+                aria-label={t('search.overlayPlaceholder')}
                 className="flex-1 text-base sm:text-lg font-bold bg-transparent text-fg placeholder-muted outline-none min-w-0"
               />
               <button
@@ -188,8 +190,8 @@ export default function SearchOverlay({ isOpen, onClose }: Props) {
           {showResults ? (
             /* ── Search results ── */
             <section>
-              <h2 className="text-xs font-black uppercase tracking-widest text-muted mb-4">
-                {searching ? '...' : `${searchResults.length} games`}
+              <h2 className="text-xs font-bold uppercase tracking-widest text-muted mb-4">
+                {searching ? '...' : `${searchResults.length} ${t('search.results')}`}
               </h2>
               {searching ? (
                 <SkeletonGrid />
@@ -202,8 +204,8 @@ export default function SearchOverlay({ isOpen, onClose }: Props) {
               ) : (
                 <div className="py-16 text-center">
                   <p className="text-4xl mb-3">🔍</p>
-                  <p className="font-black text-fg">No games found</p>
-                  <p className="text-muted text-sm mt-1 font-semibold">Try a different search term</p>
+                  <p className="font-bold text-fg">{t('search.noResults')}</p>
+                  <p className="text-muted text-sm mt-1 font-semibold">{t('search.tryDifferent')}</p>
                 </div>
               )}
             </section>
@@ -221,7 +223,7 @@ export default function SearchOverlay({ isOpen, onClose }: Props) {
                 <div className="flex items-center gap-3 mb-4">
                   <span className="w-1.5 h-6 rounded-full bg-accent" aria-hidden="true" />
                   <h2 className="text-xl font-black text-fg title-display uppercase tracking-tight">
-                    Popular
+                    {t('search.popular')}
                   </h2>
                 </div>
                 {!dataLoaded ? (
@@ -240,7 +242,7 @@ export default function SearchOverlay({ isOpen, onClose }: Props) {
                 <div className="flex items-center gap-3 mb-4">
                   <span className="w-1.5 h-6 rounded-full bg-accent" aria-hidden="true" />
                   <h2 className="text-xl font-black text-fg title-display uppercase tracking-tight">
-                    New Games
+                    {t('search.newGames')}
                   </h2>
                 </div>
                 {!dataLoaded ? (

@@ -1,22 +1,52 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import type { Game } from '@/lib/types';
 import { getRecentlyPlayed } from '@/hooks/useRecentlyPlayed';
 import GameImage from '@/components/ui/GameImage';
+import { useI18n } from '@/components/providers/I18nProvider';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export default function RecentlyPlayedPage() {
   const [games, setGames] = useState<Game[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const { t } = useI18n();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setGames(getRecentlyPlayed());
     setLoaded(true);
   }, []);
 
+  useGSAP(() => {
+    gsap.from('h1', {
+      y: 32,
+      opacity: 0,
+      duration: 0.55,
+      ease: 'power3.out',
+      immediateRender: false,
+    });
+  }, { scope: containerRef });
+
+  useGSAP(() => {
+    if (!loaded || games.length === 0) return;
+    gsap.from('.game-card', {
+      y: 24,
+      opacity: 0,
+      duration: 0.45,
+      ease: 'power2.out',
+      stagger: 0.06,
+      immediateRender: false,
+    });
+  }, { scope: containerRef, dependencies: [loaded, games.length] });
+
   return (
-    <div className="w-full px-3 sm:px-4 lg:px-5 xl:px-6 py-10">
+    <div ref={containerRef} className="w-full px-3 sm:px-4 lg:px-5 xl:px-6 py-10">
       <div className="mb-8">
         <div>
           <div className="flex flex-wrap items-center gap-3">
@@ -25,19 +55,23 @@ export default function RecentlyPlayedPage() {
                 <circle cx="12" cy="12" r="10" />
                 <path strokeLinecap="round" d="M12 6v6l4 2" />
               </svg>
-              Recently Played
+              {t('recentlyPlayed.title')}
             </h1>
             {games.length > 0 && (
               <button
-                onClick={() => { localStorage.removeItem('gz-recently-played'); setGames([]); }}
-                className="link-red-action text-sm font-black"
+                onClick={() => {
+                  localStorage.removeItem('gz-recently-played');
+                  setGames([]);
+                  window.dispatchEvent(new CustomEvent('gz-recent-changed'));
+                }}
+                className="link-red-action text-sm font-bold"
               >
-                Clear history
+                {t('recentlyPlayed.clearHistory')}
               </button>
             )}
           </div>
           <p className="text-muted text-sm font-semibold mt-1">
-            {games.length} {games.length === 1 ? 'game' : 'games'} in history
+            {games.length} {games.length === 1 ? t('favorites.game') : t('favorites.games')} {t('recentlyPlayed.inHistory')}
           </p>
         </div>
       </div>
@@ -48,15 +82,15 @@ export default function RecentlyPlayedPage() {
             <circle cx="12" cy="12" r="10" />
             <path strokeLinecap="round" d="M12 6v6l4 2" />
           </svg>
-          <p className="text-xl font-black text-fg">No history yet</p>
+          <p className="text-xl font-bold text-fg">{t('recentlyPlayed.empty')}</p>
           <p className="text-muted font-semibold mt-2 mb-8">
-            Games you play will appear here.
+            {t('recentlyPlayed.emptyDesc')}
           </p>
           <Link
             href="/games"
             className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl transition-colors duration-150"
           >
-            Browse games
+            {t('common.browseAll')}
           </Link>
         </div>
       ) : (
@@ -67,7 +101,7 @@ export default function RecentlyPlayedPage() {
               href={`/games/${game.slug}`}
               className="group flex flex-col gap-1.5 active-click"
             >
-              <div className="relative w-full rounded-xl overflow-hidden bg-border/40 aspect-square ring-2 ring-accent/20">
+              <div className="game-card relative w-full rounded-xl overflow-hidden bg-border/40 aspect-square border border-border/60">
                 <GameImage
                   game={game}
                   alt={game.title}

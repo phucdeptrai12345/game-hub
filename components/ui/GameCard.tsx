@@ -8,13 +8,14 @@ import { getPlayablePreviewVideo } from '@/lib/gamemonetize-video';
 import GameImage from './GameImage';
 
 const FAVORITES_KEY = 'gz-favs';
+export type GameBadge = 'hot' | 'new' | 'top' | 'fresh' | 'editor' | 'kids' | 'mobile';
 
 interface Props {
   game: Game;
   priority?: boolean;
   variant?: 'default' | 'wide' | 'tall' | 'spotlight';
   rank?: number;
-  badge?: 'new' | 'hot';
+  badge?: GameBadge;
   compact?: boolean;
 }
 
@@ -58,30 +59,115 @@ function FavoriteButton({ game, compact = false }: { game: Game; compact?: boole
   );
 }
 
-function CardBadge({ badge, compact }: { badge: 'new' | 'hot'; compact: boolean }) {
+const BADGE_META: Record<GameBadge, { label: string; className: string; icon: 'spark' | 'star' | 'bolt' | 'leaf' | 'edit' | 'kid' | 'phone' }> = {
+  hot: {
+    label: 'Hot',
+    className: 'bg-[oklch(63%_0.26_28)] text-white',
+    icon: 'spark',
+  },
+  new: {
+    label: 'New',
+    className: 'bg-[oklch(63%_0.26_28)] text-white',
+    icon: 'leaf',
+  },
+  top: {
+    label: 'Top',
+    className: 'bg-[oklch(86%_0.16_82)] text-zinc-950',
+    icon: 'star',
+  },
+  fresh: {
+    label: 'Fresh',
+    className: 'bg-[oklch(63%_0.26_28)] text-white',
+    icon: 'bolt',
+  },
+  editor: {
+    label: 'Editor Pick',
+    className: 'bg-[oklch(86%_0.16_82)] text-zinc-950',
+    icon: 'edit',
+  },
+  kids: {
+    label: 'Kids',
+    className: 'bg-[oklch(86%_0.16_82)] text-zinc-950',
+    icon: 'kid',
+  },
+  mobile: {
+    label: 'Mobile',
+    className: 'bg-[oklch(58%_0.16_210)] text-white',
+    icon: 'phone',
+  },
+};
+
+function BadgeIcon({ icon }: { icon: (typeof BADGE_META)[GameBadge]['icon'] }) {
+  if (icon === 'leaf') {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M20 4c-7.2.4-12.2 3-15 7.8C3.5 14.4 4 18 6.8 20c4.8-1.2 8.4-4.6 10.8-10.2" />
+        <path d="M7 19c2.8-4.2 6.2-7.2 10.2-9" />
+      </svg>
+    );
+  }
+
+  if (icon === 'bolt') {
+    return (
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M13.2 2 4.8 13.1h6.2L9.8 22l8.4-11.2h-6.1L13.2 2Z" />
+      </svg>
+    );
+  }
+
+  if (icon === 'edit') {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </svg>
+    );
+  }
+
+  if (icon === 'kid') {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="12" cy="9" r="4" />
+        <path d="M5 21a7 7 0 0 1 14 0" />
+      </svg>
+    );
+  }
+
+  if (icon === 'phone') {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <rect x="7" y="2.5" width="10" height="19" rx="2.5" />
+        <path d="M10 18h4" />
+      </svg>
+    );
+  }
+
+  if (icon === 'spark') {
+    return (
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M13 2 5.8 13.2h5.5L10.2 22 18 10.8h-5.6L13 2Z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2.6l2.8 5.7 6.3.9-4.6 4.4 1.1 6.3L12 17l-5.6 2.9 1.1-6.3-4.6-4.4 6.3-.9L12 2.6z" />
+    </svg>
+  );
+}
+
+function CardBadge({ badge, compact }: { badge: GameBadge; compact: boolean }) {
+  const meta = BADGE_META[badge];
+
   return (
     <div
-      className={`pointer-events-none absolute -left-1.5 z-30 inline-flex items-center justify-center gap-1 border-2 border-background font-black leading-none shadow-[0_8px_18px_oklch(12%_0.012_250/0.22),0_1px_3px_oklch(12%_0.012_250/0.14)] ${
+      className={`game-card-badge pointer-events-none absolute -left-1.5 z-30 inline-flex items-center justify-center gap-1.5 font-black leading-none ${meta.className} ${
         compact ? '-top-2 h-6 rounded-full px-2.5 text-[10px]' : '-top-2.5 h-7 rounded-full px-3 text-xs'
-      } ${
-        badge === 'new'
-          ? 'bg-emerald-500 text-white'
-          : 'bg-amber-300 text-zinc-950'
       }`}
     >
-      {badge === 'new' ? (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M21 12a9 9 0 0 1-15.5 6.2" />
-          <path d="M3 12a9 9 0 0 1 15.5-6.2" />
-          <path d="M3 18v-5h5" />
-          <path d="M21 6v5h-5" />
-        </svg>
-      ) : (
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 2.6l2.8 5.7 6.3.9-4.6 4.4 1.1 6.3L12 17l-5.6 2.9 1.1-6.3-4.6-4.4 6.3-.9L12 2.6z" />
-        </svg>
-      )}
-      <span>{badge === 'new' ? 'Fresh' : 'Choice'}</span>
+      <BadgeIcon icon={meta.icon} />
+      <span>{meta.label}</span>
     </div>
   );
 }
@@ -106,13 +192,9 @@ export default function GameCard({ game, priority = false, variant = 'default', 
   const shouldRenderVideo = hasVideoPreview && !videoFailed && (hovered || videoInView);
 
   const playPreviewVideo = useCallback((vid: HTMLVideoElement) => {
-    vid.muted = false;
-    vid.volume = 0.55;
-    vid.play().catch(() => {
-      // Browsers can block hover-started audio; keep the motion working.
-      vid.muted = true;
-      vid.play().catch(() => {});
-    });
+    vid.muted = true;
+    vid.volume = 0;
+    vid.play().catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -204,7 +286,7 @@ export default function GameCard({ game, priority = false, variant = 'default', 
           <video
             ref={videoRef}
             src={videoSrc}
-            loop playsInline preload={hovered ? 'auto' : 'metadata'}
+            loop muted playsInline preload={hovered ? 'auto' : 'metadata'}
             poster={game.thumb}
             onLoadedData={() => { if (hovered) setVideoPlaying(true); }}
             onCanPlay={() => { if (hovered && videoRef.current) playPreviewVideo(videoRef.current); }}

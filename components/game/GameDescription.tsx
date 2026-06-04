@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 interface Props {
   text: string;
@@ -8,6 +9,7 @@ interface Props {
 
 export default function GameDescription({ text }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const { t } = useI18n();
   const canCollapse = text.length > 420;
 
   return (
@@ -26,7 +28,7 @@ export default function GameDescription({ text }: Props) {
           className="mt-2 text-sm font-black text-accent transition-colors duration-150 hover:text-accent-hover"
           aria-expanded={expanded}
         >
-          {expanded ? 'Show less' : 'Read more'}
+          {expanded ? t('game.showLess') : t('game.readMore')}
         </button>
       )}
     </div>

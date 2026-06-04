@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect } from 'react';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 interface Props {
   error: Error & { digest?: string };
@@ -9,29 +10,31 @@ interface Props {
 }
 
 export default function Error({ error, reset }: Props) {
+  const { t } = useI18n();
+
   useEffect(() => {
     console.error('[GameZone]', error);
   }, [error]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center py-32 min-h-[60vh]">
-      <p className="text-5xl mb-5" aria-hidden="true">⚡</p>
-      <h2 className="text-2xl font-black text-fg mb-3">Something went wrong</h2>
-      <p className="text-muted font-semibold max-w-xs mb-10 leading-relaxed">
-        Couldn't load the games. Check your connection and try again.
+    <div className="mx-auto flex min-h-[60vh] max-w-7xl flex-col items-center justify-center px-4 py-32 text-center sm:px-6 lg:px-8">
+      <p className="mb-5 text-5xl" aria-hidden="true">⚡</p>
+      <h2 className="mb-3 text-2xl font-black text-fg">{t('error.title')}</h2>
+      <p className="mb-10 max-w-xs font-semibold leading-relaxed text-muted">
+        {t('error.description')}
       </p>
       <div className="flex flex-wrap justify-center gap-3">
         <button
           onClick={reset}
-          className="px-6 py-3 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl transition-colors duration-150"
+          className="rounded-xl bg-accent px-6 py-3 font-bold text-white transition-colors duration-150 hover:bg-accent-hover"
         >
-          Try again
+          {t('error.retry')}
         </button>
         <Link
           href="/"
-          className="px-6 py-3 bg-surface border border-border hover:border-accent/40 text-fg font-bold rounded-xl transition-colors duration-150"
+          className="rounded-xl border border-border bg-surface px-6 py-3 font-bold text-fg transition-colors duration-150 hover:border-accent/40"
         >
-          Home
+          {t('nav.home')}
         </Link>
       </div>
     </div>

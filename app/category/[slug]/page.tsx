@@ -182,12 +182,12 @@ const categoryContent: Record<string, { intro: string; body: string[]; tip: stri
 
 function getCategoryContent(slug: string) {
   return categoryContent[slug] ?? {
-    intro: `${categoryContent.action?.intro ?? 'Explore our collection of free online games and play instantly in your browser.'}`,
+    intro: 'Explore free online games in this category and start playing instantly in your browser. No download, no sign-up, just open a game and play on computer, tablet, or mobile.',
     body: [
-      'Our collection is updated regularly with new titles across every style and difficulty level. Whether you prefer fast-paced action or slower, more thoughtful experiences, you\'ll find games that match exactly what you\'re looking for.',
+      'This category mixes quick sessions, familiar browser game controls, and a range of styles so you can try a few titles and keep the ones that feel right.',
       'All games are free to play directly in your browser — no downloads, no installations, no account required. Just click and play immediately on any device, from desktop computers to tablets and smartphones.',
     ],
-    tip: 'Try different games within the category to find your favorites. Personal taste varies enormously, and spending a few minutes with each title is the best way to discover which ones resonate with your playstyle.',
+    tip: 'Try a few games in this category and keep the ones that feel good. Favorites are the fastest way to come back later.',
   };
 }
 
@@ -219,7 +219,12 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const sorted = sort === 'az'
     ? [...rawGames].sort((a, b) => a.title.localeCompare(b.title))
     : sort === 'new'
-    ? [...rawGames].reverse()
+    ? [...rawGames].sort((a, b) => {
+        if (!a.dateAdded && !b.dateAdded) return 0;
+        if (!a.dateAdded) return 1;
+        if (!b.dateAdded) return -1;
+        return b.dateAdded.localeCompare(a.dateAdded);
+      })
     : rawGames;
 
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
@@ -229,33 +234,32 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const SORT_OPTS = [
     { value: 'popular', label: 'Popular' },
     { value: 'new',     label: 'Newest'  },
-    { value: 'az',      label: 'A–Z'     },
+    { value: 'az',      label: 'A-Z'     },
   ];
 
   return (
     <div className="w-full px-3 sm:px-4 lg:px-5 xl:px-6 py-8">
-
       {/* Header */}
       <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-3xl font-black text-fg title-display uppercase tracking-tight">
+          <h1 className="cat-header-anim text-3xl font-black text-fg title-display uppercase tracking-tight">
             {cat.name} Games
           </h1>
-          <p className="text-muted font-semibold text-sm mt-1.5 max-w-lg">
+          <p className="cat-header-anim text-muted font-semibold text-sm mt-1.5 max-w-lg">
             {cat.description} — {rawGames.length.toLocaleString()} free games
           </p>
         </div>
 
         {/* Sort buttons */}
-        <div className="flex w-full flex-wrap items-center gap-1.5 sm:mt-1 sm:w-auto sm:shrink-0">
+        <div className="flex items-center gap-1 sm:mt-1 sm:shrink-0">
           {SORT_OPTS.map((opt) => (
             <Link
               key={opt.value}
               href={`/category/${slug}?sort=${opt.value}`}
-              className={`flex-1 rounded-full px-3 py-2 text-center text-xs font-bold transition-colors duration-150 sm:flex-none ${
+              className={`cat-sort-btn rounded-lg px-3.5 py-1.5 text-xs font-bold transition-colors duration-150 ${
                 sort === opt.value
                   ? 'bg-accent text-white'
-                  : 'bg-surface border border-border text-fg hover:bg-accent/10'
+                  : 'text-muted hover:text-fg hover:bg-border/50'
               }`}
             >
               {opt.label}
@@ -267,16 +271,20 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       {paged.length > 0 ? (
         <>
           <GameGrid games={paged} priorityCount={8} showAds={false} />
-          {totalPages > 1 && <Pagination currentPage={page} totalPages={totalPages} />}
+          {totalPages > 1 && (
+            <div className="cat-pagination">
+              <Pagination currentPage={page} totalPages={totalPages} />
+            </div>
+          )}
 
           {/* Description block */}
-          <div className="mt-16 pt-10 border-t border-border/60">
+          <div className="cat-desc-block mt-16 pt-10 border-t border-border/60">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-16">
 
               {/* Left: main description */}
               <div className="lg:col-span-2">
                 <h2 className="text-2xl font-black text-fg title-display uppercase tracking-tight mb-5">
-                  {cat.name} Games — Play Free Online
+                  About {cat.name} Games
                 </h2>
                 <p className="text-fg/80 text-base leading-relaxed font-semibold mb-5">
                   {content.intro}
@@ -290,8 +298,10 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
               {/* Right: Pro Tip */}
               <div className="lg:col-span-1">
-                <p className="text-xs font-black uppercase tracking-widest text-accent mb-3">Pro Tip</p>
-                <p className="text-fg/80 text-[0.95rem] leading-relaxed font-semibold">{content.tip}</p>
+                <div className="rounded-xl bg-accent/8 border border-accent/20 px-5 py-5">
+                  <p className="text-xs font-black uppercase tracking-widest text-accent mb-3">Pro Tip</p>
+                  <p className="text-fg/80 text-[0.95rem] leading-relaxed">{content.tip}</p>
+                </div>
               </div>
 
             </div>
@@ -300,7 +310,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       ) : (
         <div className="text-center py-28">
           <p className="text-4xl mb-4">🎮</p>
-          <p className="text-xl font-black text-fg">No {cat.name} games yet</p>
+          <p className="text-xl font-bold text-fg">No {cat.name} games yet</p>
           <p className="text-muted font-semibold mt-2 mb-8">
             Check back soon — new games are added regularly.
           </p>
@@ -308,7 +318,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             href="/games"
             className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl transition-colors duration-150"
           >
-            Browse all games
+            Browse all games →
           </Link>
         </div>
       )}

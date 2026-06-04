@@ -6,8 +6,10 @@ import { usePathname } from 'next/navigation';
 import { getRecentlyPlayed } from '@/hooks/useRecentlyPlayed';
 import { Game } from '@/lib/types';
 import GameImage from './GameImage';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 export default function RecentlyPlayedSection() {
+  const { t } = useI18n();
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [games, setGames] = useState<Game[]>([]);
   const [canPrev, setCanPrev] = useState(false);
@@ -75,14 +77,14 @@ export default function RecentlyPlayedSection() {
         <div className="flex min-w-0 items-center gap-2.5">
           <span className="h-6 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
           <h2 className="text-xl font-black uppercase tracking-tight text-fg title-display sm:text-2xl">
-            Continue Playing
+            {t('section.continuePlaying')}
           </h2>
         </div>
         <button
           onClick={() => { localStorage.removeItem('gz-recently-played'); setGames([]); }}
-          className="link-red-action shrink-0 text-sm font-black sm:text-[15px]"
+          className="link-red-action shrink-0 text-sm font-bold sm:text-[15px]"
         >
-          Clear
+          {t('common.clear')}
         </button>
       </div>
 
@@ -117,7 +119,7 @@ export default function RecentlyPlayedSection() {
 
         <button
           type="button"
-          aria-label="Previous continue playing"
+          aria-label={`${t('pagination.prev')} ${t('section.continuePlaying')}`}
           onClick={() => scrollByPage(-1)}
           className={`category-row-nav category-row-nav-prev ${canPrev ? '' : 'category-row-nav-hidden'} ${isHovered ? 'category-row-nav-visible' : ''}`}
         >
@@ -128,7 +130,7 @@ export default function RecentlyPlayedSection() {
 
         <button
           type="button"
-          aria-label="Next continue playing"
+          aria-label={`${t('pagination.next')} ${t('section.continuePlaying')}`}
           onClick={() => scrollByPage(1)}
           className={`category-row-nav category-row-nav-next ${canNext ? '' : 'category-row-nav-hidden'} ${isHovered ? 'category-row-nav-visible' : ''}`}
         >

@@ -1,5 +1,6 @@
 import { Game } from '@/lib/types';
-import GameCard from './GameCard';
+import { slugify } from '@/lib/utils';
+import GameCard, { type GameBadge } from './GameCard';
 import AdCard from './AdCard';
 import React from 'react';
 
@@ -11,7 +12,7 @@ interface Props {
   layout?: 'default' | 'poki';
   showRank?: boolean;
   rankStart?: number;
-  badge?: 'new' | 'hot';
+  badge?: GameBadge;
   badgeCount?: number;
 }
 
@@ -22,6 +23,21 @@ function getItemVariant(index: number, usePoki: boolean): 'default' | 'spotlight
   
   // Every 6th card is a 2x2 spotlight card, creating a beautiful balance of squares and double-squares
   return index % 6 === 0 ? 'spotlight' : 'default';
+}
+
+function badgeFor(game: Game, index: number, preferred?: GameBadge, badgeCount = 30): GameBadge | undefined {
+  if (!preferred || index >= badgeCount) return undefined;
+
+  const slugs = [game.category, ...game.tags].map((value) => slugify(value));
+  if (slugs.some((value) => value === 'kids' || value === 'baby' || value === 'girls')) return undefined;
+  if (game.orientation === 'portrait' || slugs.some((value) => value === 'mobile' || value === 'hypercasual')) return 'mobile';
+
+  if (preferred === 'new') return 'new';
+  if (preferred === 'top') return index % 2 === 0 ? 'top' : 'hot';
+  if (preferred === 'editor') return index % 3 === 0 ? 'editor' : index % 3 === 1 ? 'top' : 'hot';
+  if (preferred === 'fresh') return 'new';
+
+  return index % 3 === 0 ? preferred : index % 3 === 1 ? 'top' : 'editor';
 }
 
 export default function GameGrid({
@@ -99,7 +115,7 @@ export default function GameGrid({
               priority={gameIndex < priorityCount}
               variant={cardVariant}
               rank={showRank ? rankStart + gameIndex : undefined}
-              badge={badge && gameIndex < badgeCount ? badge : undefined}
+              badge={badgeFor(item.data, gameIndex, badge, badgeCount)}
             />
           </div>
         );

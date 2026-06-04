@@ -35,6 +35,14 @@ const CATEGORY_FALLBACKS: Record<string, string[]> = {
   io: ['io', 'multiplayer', 'action'],
 };
 
+const SEO_CATEGORY_LINKS = [
+  { href: '/category/racing', label: 'Racing games' },
+  { href: '/category/puzzle', label: 'Puzzle games' },
+  { href: '/category/cooking', label: 'Cooking games' },
+  { href: '/kids-site', label: 'Kids games' },
+  { href: '/games?sort=new', label: 'New games' },
+];
+
 function uniqueById<T extends { id: string }>(items: T[]): T[] {
   const seen = new Set<string>();
   return items.filter((item) => {
@@ -170,27 +178,43 @@ export default async function HomePage() {
   return (
     <div className="home-pattern relative overflow-hidden">
       {/* Hero */}
-      <section className="relative pt-5 pb-4 md:py-6">
+      <section className="home-hero-glow relative pt-5 pb-4 md:py-6">
+        {/* Floating bubbles */}
+        <div className="hero-bubbles" aria-hidden="true">
+          {[
+            { cls: 'b1', size: '7px', x: '12%', dur: '9s',  delay: '0s',  color: 'var(--bubble-red)'    },
+            { cls: 'b2', size: '5px', x: '28%', dur: '11s', delay: '-3s', color: 'var(--bubble-orange)' },
+            { cls: 'b3', size: '9px', x: '45%', dur: '8s',  delay: '-5s', color: 'var(--bubble-red)'    },
+            { cls: 'b4', size: '6px', x: '62%', dur: '13s', delay: '-1s', color: 'var(--bubble-teal)'   },
+            { cls: 'b5', size: '4px', x: '78%', dur: '10s', delay: '-7s', color: 'var(--bubble-orange)' },
+            { cls: 'b6', size: '8px', x: '90%', dur: '12s', delay: '-4s', color: 'var(--bubble-red)'    },
+          ].map(({ cls, size, x, dur, delay, color }) => (
+            <span
+              key={cls}
+              className="hero-bubble"
+              style={{ width: size, height: size, left: x, '--dur': dur, '--delay': delay, '--bcolor': color } as React.CSSProperties}
+            />
+          ))}
+        </div>
         <div className="relative z-10 w-full px-3 sm:px-4 lg:px-5 xl:px-6">
           <div className="grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.08fr)_minmax(620px,0.95fr)] lg:items-start lg:gap-4">
             <div className="min-w-0 max-w-full pt-1 md:pt-2 lg:max-w-[920px]">
-              <div className="mb-3 flex max-w-full items-center gap-2.5">
+              <div className="mb-3 flex max-w-full items-center gap-2">
                 <span className="relative flex h-3 w-3 shrink-0 items-center justify-center" aria-hidden="true">
                   <span className="home-live-dot absolute h-3 w-3 rounded-full bg-emerald-400/35" />
                   <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_oklch(76%_0.18_145/0.55)]" />
                 </span>
-                <span className="h-px w-9 shrink-0 bg-gradient-to-r from-emerald-400/85 to-accent/65" aria-hidden="true" />
-                <span className="min-w-0 truncate text-[0.72rem] font-black uppercase tracking-[0.08em] text-accent sm:text-sm sm:tracking-[0.09em]">
-                  Computer & mobile games - no sign-up
+                <span className="min-w-0 truncate text-[0.72rem] font-bold tracking-[0.06em] text-muted/70 sm:text-sm sm:tracking-[0.07em]">
+                  Computer &amp; mobile games · No sign-up
                 </span>
               </div>
               <h1
-                className="home-hero-title mb-4 font-black uppercase leading-[1.02] tracking-tight text-fg title-display"
+                className="home-hero-title mb-4 font-black leading-[1.07] tracking-tight text-fg title-display"
                 style={{ fontSize: 'clamp(1.82rem, 7.8vw, 4.2rem)' }}
               >
                 <span className="whitespace-nowrap">Play free games </span>
                 <br />
-                <span className="home-hero-accent whitespace-nowrap">on any screen.</span>
+                <span className="home-hero-accent whitespace-nowrap"><span className="home-hero-gradient">on any screen.</span></span>
               </h1>
               <p className="max-w-[calc(100vw-2rem)] break-words text-sm font-bold leading-relaxed text-muted sm:max-w-none sm:text-lg lg:max-w-[880px]">
                 <span className="block">9,000+ browser games for computer, tablet, and mobile.</span>
@@ -200,8 +224,8 @@ export default async function HomePage() {
             </div>
 
             <div className="min-w-0 space-y-3">
-              <FeaturedCollection games={featuredGames} />
-              <FeaturedCollection title="Trending This Week" games={trendingGames} />
+              <FeaturedCollection titleKey="section.featured" games={featuredGames} />
+              <FeaturedCollection titleKey="section.trending" games={trendingGames} />
             </div>
           </div>
         </div>
@@ -221,8 +245,8 @@ export default async function HomePage() {
           icon="★"
           slug="top-picks"
           games={topPickGames}
-          badgeType="hot"
-          badgeCount={6}
+          badgeType="editor"
+          badgeCount={5}
           size="large"
           seeAllHref="/games?sort=popular"
           seeAllCardTitle="All top picks"
@@ -234,16 +258,16 @@ export default async function HomePage() {
         <section>
           <div className="mb-4 flex items-center gap-3">
             <div className="flex items-center gap-3">
-              <span className="h-6 w-1.5 rounded-full bg-accent" aria-hidden="true" />
+              <span className="h-6 w-1.5 rounded-full bg-accent section-bar-glow" aria-hidden="true" />
               <h2 className="text-2xl font-black uppercase tracking-tight text-fg title-display">
                 Popular Now
               </h2>
             </div>
             <Link
               href="/games"
-              className="link-red-action text-sm font-black"
+              className="link-red-action text-sm font-bold"
             >
-              See all games →
+              See all →
             </Link>
           </div>
           <GameGrid
@@ -266,7 +290,8 @@ export default async function HomePage() {
               icon={icon}
               slug={slug}
               games={games}
-              badgeType="hot"
+              badgeType={index % 3 === 0 ? 'top' : index % 3 === 1 ? 'mobile' : 'hot'}
+              badgeCount={2}
               autoScroll
               autoScrollDelayMs={4800 + index * 350}
             />
@@ -283,7 +308,7 @@ export default async function HomePage() {
           slug="new"
           games={newReleases.slice(0, 36)}
           badgeType="new"
-          badgeCount={8}
+          badgeCount={6}
           seeAllHref="/games?sort=new"
           seeAllCardTitle="All new games"
           autoScroll
@@ -309,6 +334,13 @@ export default async function HomePage() {
                     No launcher, no install, no account step. Pick a browser game and it runs on desktop,
                     tablet, or mobile.
                   </p>
+                  <nav className="home-seo-link-row" aria-label="Popular game categories">
+                    {SEO_CATEGORY_LINKS.map((item) => (
+                      <Link key={item.href} href={item.href}>
+                        {item.label}
+                      </Link>
+                    ))}
+                  </nav>
                   <p>
                     The library mixes quick arcade rounds, racing tracks, puzzle levels, sports games,
                     shooting challenges, multiplayer arenas, cooking games, dress up games, and slower
@@ -367,7 +399,7 @@ export default async function HomePage() {
                   <div className="space-y-4">
                     {playWithFriends.map((item) => (
                       <p key={item.title} className="text-sm font-semibold leading-relaxed text-muted">
-                        <Link href={item.href} className="font-black text-fg transition-colors duration-150 hover:text-accent">
+                        <Link href={item.href} className="font-bold text-fg transition-colors duration-150 hover:text-accent">
                           {item.title}
                         </Link>
                         {item.count > 0 ? ` has ${item.count}+ games. ` : '. '}
@@ -384,7 +416,7 @@ export default async function HomePage() {
                   <div className="space-y-4">
                     {challengeGroups.map((item) => (
                       <p key={item.title} className="text-sm font-semibold leading-relaxed text-muted">
-                        <Link href={item.href} className="font-black text-fg transition-colors duration-150 hover:text-accent">
+                        <Link href={item.href} className="font-bold text-fg transition-colors duration-150 hover:text-accent">
                           {item.title}
                         </Link>
                         {item.count > 0 ? ` has ${item.count}+ games. ` : '. '}
@@ -401,7 +433,7 @@ export default async function HomePage() {
                   <div className="space-y-4">
                     {relaxGroups.map((item) => (
                       <p key={item.title} className="text-sm font-semibold leading-relaxed text-muted">
-                        <Link href={item.href} className="font-black text-fg transition-colors duration-150 hover:text-accent">
+                        <Link href={item.href} className="font-bold text-fg transition-colors duration-150 hover:text-accent">
                           {item.title}
                         </Link>
                         {item.count > 0 ? ` has ${item.count}+ games. ` : '. '}
@@ -478,8 +510,8 @@ export default async function HomePage() {
                   <li>Works on computer, tablet, and mobile</li>
                   <li>Categories for fast browsing</li>
                 </ul>
-                <Link href="/games" className="link-red-action mt-5 text-sm font-black">
-                  Browse all games
+                <Link href="/games" className="link-red-action mt-5 text-sm font-bold">
+                  Browse all games →
                 </Link>
               </div>
             </aside>

@@ -3,14 +3,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Game } from '@/lib/types';
-import GameCard from './GameCard';
+import { slugify } from '@/lib/utils';
+import GameCard, { type GameBadge } from './GameCard';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 interface Props {
   title: string;
+  titleKey?: string;
   icon: string;
   slug: string;
   games: Game[];
-  badgeType?: 'hot' | 'new';
+  badgeType?: GameBadge;
   badgeCount?: number;
   autoScroll?: boolean;
   autoScrollDelayMs?: number;
@@ -25,13 +28,14 @@ export default function CategoryRow({
   slug,
   games,
   badgeType,
-  badgeCount = 4,
+  badgeCount = 2,
   autoScroll = false,
   autoScrollDelayMs = 5200,
   size = 'default',
   seeAllHref,
   seeAllCardTitle,
 }: Props) {
+  const { t } = useI18n();
   const shellRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = useState(false);
@@ -120,6 +124,32 @@ export default function CategoryRow({
   const href = seeAllHref ?? `/category/${slug}`;
   const isLarge = size === 'large';
 
+  function badgeFor(game: Game, index: number): GameBadge | undefined {
+    if (!badgeType || index >= badgeCount) return undefined;
+
+    const slugs = [game.category, ...game.tags].map((value) => slugify(value));
+    if (slugs.some((value) => value === 'kids' || value === 'baby' || value === 'girls')) return undefined;
+    if (game.orientation === 'portrait' || slugs.some((value) => value === 'mobile' || value === 'hypercasual')) return 'mobile';
+
+    if (badgeType === 'new') {
+      return 'new';
+    }
+
+    if (badgeType === 'editor') {
+      return index % 3 === 0 ? 'editor' : index % 3 === 1 ? 'top' : 'hot';
+    }
+
+    if (badgeType === 'top') {
+      return index % 2 === 0 ? 'top' : 'hot';
+    }
+
+    if (badgeType === 'fresh') {
+      return 'new';
+    }
+
+    return index % 3 === 0 ? 'hot' : index % 3 === 1 ? 'top' : 'editor';
+  }
+
   return (
     <section className="compact-shelf">
       <div className="mb-3 flex min-w-0 items-center gap-3">
@@ -132,9 +162,9 @@ export default function CategoryRow({
         </div>
         <Link
           href={href}
-          className="link-red-action shrink-0 text-sm font-black"
+          className="link-red-action shrink-0 text-sm font-bold"
         >
-          See all
+          {t('game.seeAll')}
         </Link>
       </div>
 
@@ -149,7 +179,7 @@ export default function CategoryRow({
           className={`category-game-strip scrollbar-hidden ${isLarge ? 'category-game-strip-large' : ''}`}
         >
           {games.map((game, index) => {
-            const badge = badgeType && index < badgeCount ? badgeType : undefined;
+            const badge = badgeFor(game, index);
 
             return (
               <div

@@ -1,31 +1,36 @@
+'use client';
+
 import Link from 'next/link';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 export default function NotFound() {
+  const { t } = useI18n();
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center py-32 min-h-[60vh]">
+    <div className="mx-auto flex min-h-[60vh] max-w-7xl flex-col items-center justify-center px-4 py-32 text-center sm:px-6 lg:px-8">
       <p
-        className="text-[9rem] md:text-[12rem] font-black leading-none select-none"
+        className="select-none text-[9rem] font-black leading-none md:text-[12rem]"
         style={{ color: 'oklch(94% 0.005 255 / 0.07)' }}
         aria-hidden="true"
       >
         404
       </p>
-      <h1 className="text-3xl font-black text-fg -mt-4 mb-3">Page not found</h1>
-      <p className="text-muted font-semibold max-w-xs mb-10 leading-relaxed">
-        That page doesn't exist. Try searching for your game, or browse everything we have.
+      <h1 className="-mt-4 mb-3 text-3xl font-black text-fg">{t('notFound.title')}</h1>
+      <p className="mb-10 max-w-xs font-semibold leading-relaxed text-muted">
+        {t('notFound.description')}
       </p>
       <div className="flex flex-wrap justify-center gap-3">
         <Link
           href="/"
-          className="px-6 py-3 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl transition-colors duration-150"
+          className="rounded-xl bg-accent px-6 py-3 font-bold text-white transition-colors duration-150 hover:bg-accent-hover"
         >
-          Back to home
+          {t('notFound.backHome')}
         </Link>
         <Link
           href="/games"
-          className="px-6 py-3 bg-surface border border-border hover:border-accent/40 text-fg font-bold rounded-xl transition-colors duration-150"
+          className="rounded-xl border border-border bg-surface px-6 py-3 font-bold text-fg transition-colors duration-150 hover:border-accent/40"
         >
-          Browse games
+          {t('notFound.browseGames')}
         </Link>
       </div>
     </div>

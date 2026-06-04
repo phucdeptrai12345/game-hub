@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 const STEP_MS = 95;
 const FINISH_DELAY_MS = 700;
 
 export default function KidsPickerButton() {
+  const { t } = useI18n();
   const timerRef = useRef<number | null>(null);
   const clearRef = useRef<number | null>(null);
 
@@ -56,7 +58,7 @@ export default function KidsPickerButton() {
 
   return (
     <button type="button" className="kids-play-button" onClick={handleClick}>
-      Pick your games!
+      {t('kids.pickGames')}
     </button>
   );
 }

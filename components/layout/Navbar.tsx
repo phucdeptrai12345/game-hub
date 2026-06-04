@@ -9,7 +9,9 @@ import SearchCategoryScroller from '@/components/ui/SearchCategoryScroller';
 import GameImage from '@/components/ui/GameImage';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { useSidebar } from '@/components/providers/SidebarProvider';
+import { useI18n } from '@/components/providers/I18nProvider';
 import type { Game } from '@/lib/types';
+import Logo from '@/components/ui/Logo';
 
 function SunIcon() {
   return (
@@ -38,6 +40,7 @@ function MenuIcon() {
 
 function ThemeSwitch() {
   const { theme, toggleTheme } = useTheme();
+  const { t } = useI18n();
 
   return (
     <div className="flex h-9 shrink-0 items-center gap-0.5 rounded-full border border-border bg-navy p-0.5 shadow-[inset_0_1px_3px_oklch(10%_0.01_250/0.06)] sm:h-10 sm:gap-1 sm:p-1">
@@ -46,38 +49,39 @@ function ThemeSwitch() {
         onClick={() => { if (theme !== 'light') toggleTheme(); }}
         aria-pressed={theme === 'light'}
         aria-label="Switch to light mode"
-        className={`group flex h-8 items-center justify-center gap-1.5 rounded-full px-2 text-xs font-black transition-all duration-150 active-click sm:px-3 ${
+        className={`group flex h-8 items-center justify-center gap-1.5 rounded-full px-2 text-xs font-bold transition-all duration-150 active-click sm:px-3 ${
           theme === 'light'
             ? 'bg-accent text-white shadow-[0_3px_10px_oklch(64%_0.21_25/0.28)]'
             : 'text-muted hover:bg-navy-light hover:text-fg'
         }`}
       >
         <SunIcon />
-        <span className="hidden lg:inline">Light</span>
+        <span className="hidden lg:inline">{t('theme.light')}</span>
       </button>
       <button
         type="button"
         onClick={() => { if (theme !== 'dark') toggleTheme(); }}
         aria-pressed={theme === 'dark'}
         aria-label="Switch to dark mode"
-        className={`group flex h-8 items-center justify-center gap-1.5 rounded-full px-2 text-xs font-black transition-all duration-150 active-click sm:px-3 ${
+        className={`group flex h-8 items-center justify-center gap-1.5 rounded-full px-2 text-xs font-bold transition-all duration-150 active-click sm:px-3 ${
           theme === 'dark'
             ? 'bg-accent text-white shadow-[0_3px_10px_oklch(64%_0.21_25/0.28)]'
             : 'text-muted hover:bg-navy-light hover:text-fg'
         }`}
       >
         <MoonIcon />
-        <span className="hidden lg:inline">Dark</span>
+        <span className="hidden lg:inline">{t('theme.dark')}</span>
       </button>
     </div>
   );
 }
 
 const NAV_LINKS = [
-  { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' },
-  { href: '/kids-site', label: 'For Kids' },
-  { href: '/favorites', label: 'Favorites' },
+  { href: '/',          labelKey: 'nav.home'      },
+  { href: '/games',     labelKey: 'nav.allGames'  },
+  { href: '/about',     labelKey: 'nav.about'     },
+  { href: '/kids-site', labelKey: 'nav.forKids'   },
+  { href: '/favorites', labelKey: 'nav.favorites' },
 ] as const;
 
 function DesktopSearchResult({ game }: { game: Game }) {
@@ -92,11 +96,11 @@ function DesktopSearchResult({ game }: { game: Game }) {
           alt=""
           fill
           className="object-cover transition-transform duration-200 group-hover:scale-105"
-          fallbackClassName="absolute inset-0 flex items-center justify-center text-sm font-black text-muted"
+          fallbackClassName="absolute inset-0 flex items-center justify-center text-sm font-bold text-muted"
           sizes="120px"
         />
       </div>
-      <p className="line-clamp-1 text-[13px] font-black leading-tight text-fg transition-colors duration-150 group-hover:text-accent">
+      <p className="line-clamp-1 text-[13px] font-bold leading-tight text-fg transition-colors duration-150 group-hover:text-accent">
         {game.title}
       </p>
     </Link>
@@ -106,6 +110,7 @@ function DesktopSearchResult({ game }: { game: Game }) {
 function DesktopSearch() {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useI18n();
   const rootRef = useRef<HTMLFormElement>(null);
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -216,7 +221,7 @@ function DesktopSearch() {
               e.currentTarget.blur();
             }
           }}
-          placeholder="Search games and categories..."
+          placeholder={t('search.placeholder')}
           aria-label="Search games"
           className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-fg outline-none ring-0 placeholder:text-muted focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
           style={{ outline: 'none' }}
@@ -246,16 +251,16 @@ function DesktopSearch() {
               ) : (
                 <div className="space-y-5">
                   <section>
-                    <h2 className="mb-3 text-xs font-black uppercase tracking-widest text-muted">
-                      Categories
+                    <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-muted">
+                      {t('search.categories')}
                     </h2>
                     <SearchCategoryScroller onNavigate={() => setOpen(false)} />
                   </section>
 
                   {popularGames.length > 0 && (
                     <section>
-                      <h2 className="mb-3 text-xs font-black uppercase tracking-widest text-muted">
-                        Popular
+                      <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-muted">
+                        {t('search.popular')}
                       </h2>
                       <div className="grid grid-cols-6 gap-3">
                         {popularGames.map((game) => (
@@ -267,8 +272,8 @@ function DesktopSearch() {
 
                   {newGames.length > 0 && (
                     <section>
-                      <h2 className="mb-3 text-xs font-black uppercase tracking-widest text-muted">
-                        New Games
+                      <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-muted">
+                        {t('search.newGames')}
                       </h2>
                       <div className="grid grid-cols-6 gap-3">
                         {newGames.map((game) => (
@@ -290,8 +295,8 @@ function DesktopSearch() {
               </div>
             ) : results.length > 0 ? (
               <>
-                <h2 className="mb-3 text-xs font-black uppercase tracking-widest text-muted">
-                  {results.length} games
+                <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-muted">
+                  {results.length} {t('search.results')}
                 </h2>
                 <div className="grid grid-cols-6 gap-3">
                   {results.map((game) => (
@@ -300,15 +305,15 @@ function DesktopSearch() {
                 </div>
                 <button
                   type="submit"
-                  className="mt-4 flex w-full items-center justify-center rounded-xl bg-accent px-3 py-2.5 text-sm font-black text-white transition-colors duration-150 hover:bg-accent-hover active-click"
+                  className="mt-4 flex w-full items-center justify-center rounded-xl bg-accent px-3 py-2.5 text-sm font-bold text-white transition-colors duration-150 hover:bg-accent-hover active-click"
                 >
-                  Search all results
+                  {t('search.seeAll')}
                 </button>
               </>
             ) : (
               <div className="px-3 py-5 text-center">
-                <p className="text-sm font-black text-fg">No games found</p>
-                <p className="mt-1 text-xs font-bold text-muted">Try a different search term</p>
+                <p className="text-sm font-bold text-fg">{t('search.noResults')}</p>
+                <p className="mt-1 text-xs font-bold text-muted">{t('search.tryDifferent')}</p>
               </div>
             )}
           </div>
@@ -321,6 +326,7 @@ function DesktopSearch() {
 export default function Navbar() {
   const pathname = usePathname();
   const { hidden, toggle: toggleSidebar } = useSidebar();
+  const { t } = useI18n();
 
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -329,7 +335,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-[0_2px_16px_oklch(10%_0.01_250/0.08)]">
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/60 shadow-[0_2px_20px_oklch(10%_0.01_250/0.10)]">
         <div className="flex items-center h-16">
 
           {/* Desktop: hamburger in w-14 box — aligns with sidebar column */}
@@ -359,26 +365,7 @@ export default function Navbar() {
             </button>
 
             {/* Logo */}
-            <Link href="/" className="shrink-0 flex items-center group active-click" aria-label="GameZone home">
-              <svg
-                className="w-8 h-8 sm:w-9 sm:h-9 text-accent mr-2 sm:mr-2.5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-8deg] shrink-0"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M18 6H6a4 4 0 0 0-4 4v3a4 4 0 0 0 4 4h1.5a3 3 0 0 1 2.5 1.5L11 20a1 1 0 0 0 2 0l1-1.5a3 3 0 0 1 2.5-1.5H18a4 4 0 0 0 4-4v-3a4 4 0 0 0-4-4z" fill="currentColor" fillOpacity="0.15" />
-                <path d="M6 12h4M8 10v4" />
-                <circle cx="15" cy="11.5" r="1" fill="currentColor" stroke="none" />
-                <circle cx="17.5" cy="13.5" r="1" fill="currentColor" stroke="none" />
-              </svg>
-              <span className="text-fg font-black text-xl sm:text-3xl tracking-tight leading-none title-display uppercase">
-                Game<span className="text-accent">Zone</span>
-              </span>
-            </Link>
+            <Logo />
             </div>
 
             {/* Center search bar — desktop only */}
@@ -389,13 +376,13 @@ export default function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`rounded-full px-4 py-2 text-sm font-black transition-colors duration-150 active-click ${
+                    className={`rounded-full px-4 py-2 text-sm font-bold transition-all duration-150 active-click ${
                       active
-                        ? 'bg-accent-light text-accent'
+                        ? 'bg-accent/10 text-accent ring-1 ring-inset ring-accent/25'
                         : 'text-muted hover:bg-navy hover:text-accent'
                     }`}
                   >
-                    {link.label}
+                    {t(link.labelKey)}
                   </Link>
                 );
               })}

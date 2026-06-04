@@ -1,53 +1,55 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import GameImage from '@/components/ui/GameImage';
-import AboutReveal from './AboutReveal';
-import { getAllGames, getCatalogStats, getNewestGames } from '@/lib/gamemonetize';
-import { slugify } from '@/lib/utils';
-import type { Game } from '@/lib/types';
+import { getAllGames, getCatalogStats } from '@/lib/gamemonetize';
+import AboutAnimatedBackground from './AboutAnimatedBackground';
+import AboutAnimations from './AboutAnimations';
+import './about.css';
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'About GameZone',
-  description:
-    'GameZone is a free browser games platform built for instant play across computer, tablet, and mobile.',
+  description: 'GameZone is a free browser games platform built for instant play across computer, tablet, and mobile.',
 };
 
 const PRINCIPLES = [
   {
-    label: 'Discovery',
-    title: 'Find something good fast.',
-    text: 'Popular games, fresh releases, categories, search, favorites, and recently played lists keep the catalog easy to scan.',
+    num: '01',
+    title: 'Find good games instantly.',
+    text: 'Popular rows, new releases, categories, search, favorites, and recently played lists make the next click obvious — no hunting required.',
+    color: 'from-purple-500 to-purple-400',
+    solidColor: 'bg-purple-500',
+    textColor: 'text-purple-500',
+    glow: 'hover:shadow-[0_20px_40px_-10px_rgba(168,85,247,0.4)]',
   },
   {
-    label: 'Access',
-    title: 'No install wall.',
-    text: 'Games open in the browser, so players can jump in from a computer, tablet, or phone without a launcher or account step.',
+    num: '02',
+    title: 'Zero friction.',
+    text: 'Games run right in the browser on your computer, tablet, and phone. No launcher, no download, no account step before playing.',
+    color: 'from-blue-500 to-blue-400',
+    solidColor: 'bg-blue-500',
+    textColor: 'text-blue-500',
+    glow: 'hover:shadow-[0_20px_40px_-10px_rgba(59,130,246,0.4)]',
   },
   {
-    label: 'Curation',
-    title: 'A cleaner catalog.',
-    text: 'The library is filtered around playable HTML5 games and organized by genre, source, quality, and repeat play value.',
+    num: '03',
+    title: 'Curated quality.',
+    text: 'The catalog filters out low-quality and broken titles. What stays is grouped by genre so you find something worth playing quickly.',
+    color: 'from-emerald-500 to-emerald-400',
+    solidColor: 'bg-emerald-500',
+    textColor: 'text-emerald-500',
+    glow: 'hover:shadow-[0_20px_40px_-10px_rgba(16,185,129,0.4)]',
   },
   {
-    label: 'Sustainability',
-    title: 'Built for a real games site.',
-    text: 'Ad placements are planned into the layout so the site can stay free without covering the game experience.',
+    num: '04',
+    title: 'Respectful ads.',
+    text: 'Ad spaces are planned into the layout so the site stays free without annoying banners covering the game or popping over the player.',
+    color: 'from-orange-500 to-orange-400',
+    solidColor: 'bg-orange-500',
+    textColor: 'text-orange-500',
+    glow: 'hover:shadow-[0_20px_40px_-10px_rgba(249,115,22,0.4)]',
   },
-];
-
-const PLAY_MODES = [
-  'Action',
-  'Racing',
-  'Puzzle',
-  'Sports',
-  'IO',
-  'Kids',
-  'Cooking',
-  'Arcade',
-  'Strategy',
-  'Adventure',
 ];
 
 function compactNumber(value: number) {
@@ -55,169 +57,142 @@ function compactNumber(value: number) {
   return `${value}+`;
 }
 
-function uniqueCategories(games: Game[]) {
-  return [...new Set(games.map((game) => game.category).filter(Boolean))].sort();
-}
-
-function VisualTile({ game, index }: { game: Game; index: number }) {
-  return (
-    <Link
-      href={`/games/${game.slug}`}
-      className={`about-visual-tile group relative block overflow-hidden rounded-2xl border border-border bg-navy shadow-[0_16px_34px_oklch(20%_0.02_250/0.14)] ${
-        index === 0 ? 'col-span-2 row-span-2' : ''
-      }`}
-    >
-      <GameImage
-        game={game}
-        alt=""
-        fill
-        className="object-cover transition-transform duration-300 group-hover:scale-105"
-        fallbackClassName="text-xs"
-        sizes={index === 0 ? '360px' : '160px'}
-      />
-      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/82 via-black/30 to-transparent p-3">
-        <span className="line-clamp-1 text-sm font-black text-white drop-shadow">
-          {game.title}
-        </span>
-      </span>
-    </Link>
-  );
-}
-
 export default async function AboutPage() {
-  const [games, newestGames, stats] = await Promise.all([
+  const [games, stats] = await Promise.all([
     getAllGames(),
-    getNewestGames(8),
     getCatalogStats(),
   ]);
 
   const topGames = games.slice(0, 5);
-  const visualGames = [...newestGames, ...games].slice(0, 6);
-  const categories = uniqueCategories(games);
-  const providerCount = Object.keys(stats.byProvider).length;
 
-  const statBlocks = [
-    { value: compactNumber(stats.total), label: 'browser games' },
-    { value: `${categories.length}+`, label: 'game categories' },
-    { value: `${providerCount}`, label: 'catalog sources' },
-    { value: '0', label: 'downloads required' },
+  const STATS = [
+    { value: compactNumber(stats.total), label: 'Browser games', color: 'text-rose-500', bgHover: 'hover:border-rose-500/30' },
+    { value: '0',    label: 'Downloads needed', color: 'text-blue-500', bgHover: 'hover:border-blue-500/30' },
+    { value: '3',    label: 'Screen types', color: 'text-amber-500', bgHover: 'hover:border-amber-500/30' },
+    { value: '100%', label: 'Free forever', color: 'text-emerald-500', bgHover: 'hover:border-emerald-500/30' },
   ];
 
   return (
-    <div className="about-page home-pattern relative overflow-hidden">
-      <AboutReveal />
-      <section className="about-hero-section relative overflow-hidden border-b border-border/70 px-4 py-10 sm:px-6 lg:px-8 xl:px-12">
-        <div className="about-hero-wash" aria-hidden="true" />
-        <div className="about-hero-ribbon" aria-hidden="true" />
+    <div className="about-page-scroll h-[calc(100vh-3.5rem)] w-full overflow-y-auto snap-y snap-mandatory scroll-smooth relative text-fg overflow-x-hidden selection:bg-accent/30">
+      <AboutAnimatedBackground />
+      <AboutAnimations />
 
-        <div className="about-hero-grid relative z-10 grid items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(520px,0.72fr)]">
-          <div className="about-copy max-w-4xl">
-            <p className="mb-4 inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-accent">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
-              About GameZone
-            </p>
-            <h1 className="about-hero-title max-w-4xl font-black leading-[0.98] text-fg title-display">
-              GameZone keeps browser games close at hand.
-            </h1>
-            <p className="mt-6 max-w-3xl text-lg font-bold leading-8 text-muted sm:text-xl">
-              A quick place to open a game, find another one, and come back later without losing the thread.
-              It works across computer, tablet, and mobile with no install step in the way.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/games"
-                className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-6 text-sm font-black text-white shadow-[0_14px_28px_oklch(63%_0.26_28/0.24)] transition-colors duration-150 hover:bg-accent-hover"
-              >
-                Browse games
-              </Link>
-              <Link
-                href="/kids-site"
-                className="inline-flex h-12 items-center justify-center rounded-full border border-border bg-surface px-6 text-sm font-black text-fg transition-colors duration-150 hover:border-accent/40 hover:text-accent"
-              >
-                For kids
-              </Link>
-            </div>
+      {/* ══ 1. HERO ══════════════════════════════════════════════════ */}
+      <section className="about-section snap-start snap-always relative px-6 sm:px-10 lg:px-16 xl:px-20 pt-16 pb-12 min-h-[calc(100vh-3.5rem)] flex flex-col justify-center">
+        <div className="max-w-5xl mx-auto w-full text-center">
+          <div className="about-anim inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-border shadow-sm mb-6 hover-wiggle cursor-pointer transition-colors hover:border-accent/50">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-black uppercase tracking-wider text-muted">About GameZone</span>
           </div>
 
-          <div className="about-visual-wrap relative mx-auto w-full max-w-[640px]">
-            <div className="about-visual-card relative grid aspect-[1.06] grid-cols-3 grid-rows-3 gap-3 rounded-[28px] border border-border/70 bg-background/80 p-3 shadow-[0_30px_80px_oklch(12%_0.02_250/0.18)] backdrop-blur">
-              {visualGames.slice(0, 6).map((game, index) => (
-                <VisualTile key={game.id} game={game} index={index} />
-              ))}
-            </div>
-            <div className="about-stat-strip absolute -bottom-5 left-6 right-6 grid grid-cols-2 gap-2 rounded-2xl border border-border bg-surface/95 p-3 shadow-[0_18px_36px_oklch(12%_0.02_250/0.16)] sm:grid-cols-4">
-              {statBlocks.map((item) => (
-                <div key={item.label} className="text-center">
-                  <p className="text-xl font-black text-accent title-display">{item.value}</p>
-                  <p className="text-[10px] font-black uppercase tracking-wide text-muted">{item.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+          <h1 className="about-anim text-5xl sm:text-6xl lg:text-[5rem] font-black leading-[0.95] tracking-tight title-display mb-6">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500">Open a game.</span><br />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 to-rose-500">Start playing.</span>
+          </h1>
 
-      <section className="border-b border-border/70 bg-surface/80 py-7">
-        <div className="about-mode-rail overflow-hidden">
-          <div className="about-mode-track flex w-max items-center gap-3 px-4">
-            {[...PLAY_MODES, ...PLAY_MODES].map((mode, index) => (
-              <Link
-                key={`${mode}-${index}`}
-                href={`/category/${slugify(mode)}`}
-                className="rounded-full border border-border bg-background px-4 py-2 text-xs font-black uppercase tracking-wide text-fg transition-colors duration-150 hover:border-accent/40 hover:text-accent"
-                aria-hidden={index >= PLAY_MODES.length}
-                tabIndex={index >= PLAY_MODES.length ? -1 : undefined}
-              >
-                {mode} games
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="about-dark-panel bg-[oklch(15%_0.035_276)] px-4 py-16 text-white sm:px-6 lg:px-8 xl:px-12">
-        <div className="mx-auto max-w-6xl text-center">
-          <h2 className="about-section-title mx-auto max-w-4xl font-black leading-none title-display">
-            Simple for players.
-            <br />
-            <span className="text-accent">Careful behind the scenes.</span>
-          </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-base font-bold leading-7 text-white/72">
-            The boring parts are handled quietly: catalog quality, playable embeds, fast browsing, and sensible ad space.
+          <p className="about-anim max-w-3xl mx-auto text-lg md:text-xl font-bold leading-8 text-muted mb-10">
+            A free browser games platform built purely for fun. No installations, no forced sign-ups, no hidden paywalls. 
+            Just pick a title and it runs — flawlessly, on any screen, right this very second. Welcome to the new era of instant gaming.
           </p>
 
-          <div className="about-principle-grid mt-12 grid grid-cols-1 gap-4 md:grid-cols-2">
-            {PRINCIPLES.map((item, index) => (
-              <article
-                key={item.title}
-                className="about-principle-card about-reveal-item rounded-2xl bg-[oklch(97%_0.014_88)] p-6 text-left text-fg shadow-[0_18px_40px_oklch(5%_0.02_276/0.28)] lg:p-8"
-              >
-                <p className="mb-8 text-xs font-black uppercase tracking-wide text-accent">{item.label}</p>
-                <h3 className="max-w-md text-3xl font-black leading-none title-display">
-                  {item.title}
-                </h3>
-                <p className="mt-4 max-w-xl text-sm font-bold leading-7 text-muted">{item.text}</p>
-              </article>
+          <div className="about-anim flex flex-wrap items-center justify-center gap-4">
+            <Link href="/games" className="btn-bouncy">
+              Play Now
+            </Link>
+            <Link href="/kids-site" className="btn-bouncy btn-bouncy-ghost">
+              For Kids
+            </Link>
+          </div>
+        </div>
+
+        {/* Bouncing Scroll Indicator */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted mb-2 animate-pulse">Scroll</span>
+          <div className="w-8 h-12 rounded-full border-2 border-muted flex justify-center p-1">
+            <div className="w-1.5 h-3 bg-muted rounded-full animate-bounce mt-1" />
+          </div>
+        </div>
+      </section>
+
+      {/* ══ 2. NUMBERS ═══════════════════════════════════════════════ */}
+      <section className="about-section snap-start snap-always px-6 sm:px-10 lg:px-16 xl:px-20 py-12 md:py-16 min-h-[calc(100vh-3.5rem)] flex items-center relative z-10">
+        <div className="max-w-6xl mx-auto w-full">
+          <div className="text-center mb-10 lg:mb-14">
+            <h2 className="about-anim text-4xl sm:text-5xl lg:text-6xl font-black title-display mb-4">
+              Massive scale.<br/>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-500">Zero barriers.</span>
+            </h2>
+            <p className="about-anim text-base lg:text-lg font-bold text-muted max-w-3xl mx-auto">
+              We've built a robust global platform that effortlessly handles millions of gaming sessions every single month. We never ask you to log in, download a launcher, or pay a dime to jump into the action.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
+            {STATS.map((stat) => (
+              <div key={stat.label} className={`about-stat-item bento-card stat-card text-center overflow-hidden relative !p-6 lg:!p-8 flex flex-col justify-center items-center transition-colors ${stat.bgHover}`}>
+                {/* Decorative background glow for the card */}
+                <div className={`absolute -bottom-8 -right-8 w-24 h-24 rounded-full blur-[2.5rem] opacity-30 ${stat.color.replace('text-', 'bg-')} pointer-events-none group-hover:opacity-50 transition-opacity`} />
+                <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-${stat.color.replace('text-', '')} to-transparent opacity-20`} />
+
+                <p className={`text-4xl sm:text-5xl lg:text-6xl font-black title-display mb-2 lg:mb-3 relative z-10 ${stat.color} transition-transform duration-300`}>{stat.value}</p>
+                <p className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-muted group-hover:text-fg transition-colors relative z-10">{stat.label}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="relative overflow-hidden px-4 py-16 sm:px-6 lg:px-8 xl:px-12">
-        <div className="about-soft-sash" aria-hidden="true" />
-        <div className="relative z-10 mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,0.55fr)] lg:items-center">
-          <div>
-            <p className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-accent">
+      {/* ══ 3. BENTO GRID PRINCIPLES ═════════════════════════════════ */}
+      <section className="about-section snap-start snap-always px-6 sm:px-10 lg:px-16 xl:px-20 py-8 lg:py-12 min-h-[calc(100vh-3.5rem)] flex items-center relative z-10">
+        <div className="max-w-5xl mx-auto w-full">
+          <div className="text-center mb-6 lg:mb-8">
+            <h2 className="about-anim text-3xl sm:text-4xl lg:text-5xl font-black title-display mb-2">How we do it right.</h2>
+            <p className="about-anim text-sm lg:text-base font-bold text-muted">Everything is built around the player.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {PRINCIPLES.map((item, index) => (
+              <div 
+                key={item.num} 
+                className={`about-principle-item bento-card group flex flex-col justify-between transition-all duration-300 ${item.glow} !p-6 lg:!p-8 gap-4 lg:gap-6 overflow-hidden relative hover:-translate-y-2 hover:scale-[1.02] hover:z-10`}
+              >
+                {/* Solid colorful top border line (thicker) */}
+                <div className={`absolute top-0 left-0 w-full h-2 ${item.solidColor}`} />
+                
+                {/* Subtle colorful background glow on hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-[0.04] transition-opacity duration-300 pointer-events-none`} />
+
+                <div className="flex-1 relative z-10 mt-2">
+                  <div className={`font-black text-xs uppercase tracking-widest mb-3 ${item.textColor}`}>
+                    Principle {item.num}
+                  </div>
+                  <h3 className="text-xl lg:text-2xl font-black mb-3 text-fg transition-colors">{item.title}</h3>
+                  <p className="text-sm lg:text-base font-bold text-muted leading-relaxed group-hover:text-fg/80 transition-colors">{item.text}</p>
+                </div>
+                
+                <div className={`absolute -bottom-2 -right-4 font-black text-[7rem] lg:text-[9rem] title-display select-none transition-transform duration-500 group-hover:scale-110 group-hover:-translate-x-2 z-0 bg-clip-text text-transparent bg-gradient-to-br ${item.color} opacity-[0.04] group-hover:opacity-[0.15]`}>
+                  {item.num}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ 4. GET OUT OF THE WAY ════════════════════════════════════ */}
+      <section className="about-section snap-start snap-always px-6 sm:px-10 lg:px-16 xl:px-20 py-12 md:py-16 min-h-[calc(100vh-3.5rem)] flex items-center relative z-10">
+        <div className="max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 lg:gap-16 items-center">
+          <div className="space-y-6">
+            <span className="about-anim text-xs font-black uppercase tracking-widest text-red-600 dark:text-red-500 block">
               What we are building
-            </p>
-            <h2 className="max-w-4xl text-4xl font-black uppercase leading-tight text-fg title-display sm:text-6xl">
+            </span>
+            <h2 className="about-anim text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.1] title-display text-slate-800 dark:text-white uppercase">
               A game site that feels fast, clear, and worth returning to.
             </h2>
-            <div className="mt-6 max-w-4xl space-y-4 text-base font-semibold leading-8 text-muted">
+            <div className="about-anim space-y-4 text-base lg:text-lg font-semibold leading-relaxed text-slate-500 dark:text-slate-400">
               <p>
                 GameZone organizes thousands of HTML5 games into a layout that is quick to scan:
-                featured picks, trending games, category rows, new releases, search, favorites, and
-                recently played history.
+                featured picks, trending games, category rows, new releases, search, favorites, and recently played history.
               </p>
               <p>
                 The goal is not to make players learn the site. The goal is to make the next game obvious,
@@ -226,35 +201,28 @@ export default async function AboutPage() {
             </div>
           </div>
 
-          <aside className="about-top-card rounded-[26px] border border-border bg-surface p-5 shadow-[0_24px_54px_oklch(18%_0.02_250/0.12)]">
-            <p className="mb-4 text-sm font-black uppercase tracking-wide text-accent">
+          <aside className="about-anim bento-card !p-6 md:!p-8 !bg-white/95 dark:!bg-slate-900/95 border border-border shadow-xl rounded-[24px]">
+            <p className="mb-6 text-xs font-black uppercase tracking-widest text-red-600 dark:text-red-500">
               Players open most
             </p>
-            <ol className="divide-y divide-border/70">
-              {topGames.map((game, index) => (
-                <li key={game.id}>
-                  <Link href={`/games/${game.slug}`} className="group flex items-center gap-3 py-3">
-                    <span className="w-7 shrink-0 text-sm font-black text-accent">
-                      {String(index + 1).padStart(2, '0')}
+            <ol className="about-games-list space-y-4 divide-y divide-slate-100 dark:divide-slate-800">
+              {topGames.map((game, i) => (
+                <li key={game.id} className="about-game-item pt-4 first:pt-0">
+                  <Link href={`/games/${game.slug}`} className="group flex items-center gap-4 transition-transform hover:translate-x-1 duration-200">
+                    <span className="w-6 text-base font-black text-red-600 dark:text-red-500 shrink-0">
+                      0{i + 1}
                     </span>
-                    <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-border/70 bg-navy">
-                      <GameImage
-                        game={game}
-                        alt=""
-                        fill
-                        className="object-cover transition-transform duration-200 group-hover:scale-105"
-                        fallbackClassName="text-[10px]"
-                        sizes="56px"
-                      />
-                    </span>
-                    <span className="min-w-0">
-                      <span className="line-clamp-1 font-black text-fg transition-colors duration-150 group-hover:text-accent">
+                    <div className="relative h-12 w-12 rounded-full overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700 bg-navy shadow-sm group-hover:scale-105 group-hover:border-red-500 dark:group-hover:border-red-500 transition-all duration-300">
+                      <GameImage game={game} alt={game.title} fill className="object-cover" sizes="48px" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-1 text-sm font-black text-slate-800 dark:text-white transition-colors group-hover:text-red-600 dark:group-hover:text-red-500">
                         {game.title}
-                      </span>
-                      <span className="mt-0.5 block text-xs font-black uppercase tracking-wide text-muted">
+                      </p>
+                      <p className="mt-0.5 text-[10px] font-black uppercase tracking-wider text-red-600 dark:text-red-500">
                         Play now
-                      </span>
-                    </span>
+                      </p>
+                    </div>
                   </Link>
                 </li>
               ))}
@@ -263,60 +231,52 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className="px-4 pb-16 sm:px-6 lg:px-8 xl:px-12">
-        <div className="mx-auto grid max-w-7xl gap-4 lg:grid-cols-2">
-          <article className="about-large-card rounded-[28px] border border-border bg-surface p-7 shadow-[0_22px_50px_oklch(18%_0.02_250/0.10)]">
-            <p className="mb-16 text-sm font-black uppercase tracking-wide text-accent">For players</p>
-            <h3 className="max-w-xl text-4xl font-black uppercase leading-tight text-fg title-display">
-              Open the game. Keep your progress nearby.
-            </h3>
-            <p className="mt-5 max-w-xl text-sm font-bold leading-7 text-muted">
-              Favorites and recently played games make it easier to come back to a session without digging
-              through the whole catalog again.
-            </p>
-            <Link href="/favorites" className="link-red-action mt-6 text-sm font-black">
-              View favorites
-            </Link>
-          </article>
+      {/* ══ 5. TECHNOLOGY ════════════════════════════════════════════ */}
+      <section className="about-section snap-start snap-always px-6 sm:px-10 lg:px-16 xl:px-20 py-12 md:py-16 min-h-[calc(100vh-3.5rem)] flex items-center relative z-10">
+        <div className="max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div className="order-2 md:order-1 relative aspect-square w-full max-w-sm mx-auto flex items-center justify-center about-anim">
+            {/* Spinning decorative geometric elements */}
+            <div className="absolute inset-0 rounded-[2rem] border-2 border-dashed border-accent/20 animate-[spin_20s_linear_infinite]" />
+            <div className="absolute inset-8 rounded-full border border-fuchsia-500/30 animate-[spin_15s_linear_infinite_reverse]" />
+            <div className="absolute inset-16 rounded-3xl border border-cyan-500/40 animate-[spin_25s_linear_infinite]" />
+            
+            {/* Glowing core */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-40 h-40 rounded-full bg-gradient-to-tr from-accent via-fuchsia-500 to-cyan-500 blur-3xl opacity-50 animate-pulse" />
+              <div className="z-10 text-center">
+                <span className="block text-4xl lg:text-5xl font-black title-display text-fg">HTML5</span>
+                <span className="block text-sm font-black uppercase tracking-widest text-muted mt-2">WebGL & WASM</span>
+              </div>
+            </div>
+          </div>
 
-          <article className="about-large-card about-red-card relative overflow-hidden rounded-[28px] border border-border bg-accent p-7 text-white shadow-[0_22px_50px_oklch(63%_0.26_28/0.18)]">
-            <div className="about-red-card-stripe" aria-hidden="true" />
-            <p className="relative mb-16 text-sm font-black uppercase tracking-wide text-white/80">
-              For developers and partners
+          <div className="order-1 md:order-2">
+            <h2 className="about-anim text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.1] title-display mb-6">
+              Lightning fast.<br />
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent to-fuchsia-500">Built on modern tech.</span>
+            </h2>
+            <p className="about-anim text-base lg:text-lg font-semibold leading-relaxed text-muted mb-6">
+              Every single game on our platform is meticulously optimized to run natively in your browser. By leveraging HTML5, WebGL, and WebAssembly, we deliver console-quality graphics without requiring a single plugin.
             </p>
-            <h3 className="relative max-w-xl text-4xl font-black uppercase leading-tight title-display">
-              Browser games deserve clean discovery.
-            </h3>
-            <p className="relative mt-5 max-w-xl text-sm font-bold leading-7 text-white/82">
-              GameZone is built around playable embeds, category discovery, and ad-ready page structure.
-              The site can grow without making the game screen feel like an afterthought.
+            <p className="about-anim text-base lg:text-lg font-semibold leading-relaxed text-muted">
+              Our global CDN infrastructure ensures that whether you're playing from New York or Tokyo, your game loads instantly and runs smoothly at a buttery 60 frames per second. This is the future of accessible, high-performance gaming.
             </p>
-            <Link
-              href="/contact"
-              className="relative mt-6 inline-flex h-11 items-center rounded-full bg-white px-5 text-sm font-black text-accent transition-opacity duration-150 hover:opacity-90"
-            >
-              Contact us
-            </Link>
-          </article>
+          </div>
         </div>
       </section>
 
-      <section className="border-t border-border/70 px-4 py-16 sm:px-6 lg:px-8 xl:px-12">
-        <div className="about-final-cta mx-auto flex max-w-7xl flex-col gap-6 rounded-[32px] bg-[oklch(15%_0.035_276)] p-8 text-white shadow-[0_24px_60px_oklch(8%_0.02_276/0.22)] md:flex-row md:items-center md:justify-between md:p-10">
-          <div>
-            <p className="mb-2 text-sm font-black uppercase tracking-[0.14em] text-accent">
-              Ready to play?
-            </p>
-            <h2 className="max-w-3xl text-4xl font-black uppercase leading-tight title-display sm:text-5xl">
-              Start with what is trending right now.
-            </h2>
+      {/* ══ 6. CTA ═══════════════════════════════════════════════════ */}
+      <section className="about-section snap-start snap-always px-6 py-32 min-h-[calc(100vh-3.5rem)] flex flex-col justify-center items-center text-center relative z-10">
+        <div className="max-w-3xl mx-auto w-full">
+          <p className="about-anim mb-6 text-sm font-black uppercase tracking-widest text-accent">Ready?</p>
+          <h2 className="about-anim text-5xl sm:text-6xl font-black title-display mb-8">
+            Start playing right now.
+          </h2>
+          <div className="about-anim mt-12">
+            <Link href="/games" className="btn-bouncy !text-xl !px-10 !py-5">
+              Let's Go
+            </Link>
           </div>
-          <Link
-            href="/games"
-            className="inline-flex h-12 shrink-0 items-center justify-center rounded-full bg-accent px-6 text-sm font-black text-white transition-colors duration-150 hover:bg-accent-hover"
-          >
-            Browse all games
-          </Link>
         </div>
       </section>
     </div>

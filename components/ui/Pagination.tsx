@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 interface Props {
   currentPage: number;
@@ -11,6 +12,7 @@ export default function Pagination({ currentPage, totalPages }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { t } = useI18n();
 
   if (totalPages <= 1) return null;
 
@@ -43,7 +45,7 @@ export default function Pagination({ currentPage, totalPages }: Props) {
         disabled={currentPage === 1}
         className="px-4 py-2.5 rounded-lg text-sm font-semibold text-muted hover:bg-accent hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
-        ← Prev
+        {t('pagination.prev')}
       </button>
 
       {pages.map((p, i) =>
@@ -71,7 +73,7 @@ export default function Pagination({ currentPage, totalPages }: Props) {
         disabled={currentPage === totalPages}
         className="px-4 py-2.5 rounded-lg text-sm font-semibold text-muted hover:bg-accent hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
-        Next →
+        {t('pagination.next')}
       </button>
     </nav>
   );

@@ -191,10 +191,10 @@ function Bar() {
         <div className="route-loading-content">
           <div className="route-loading-mark" aria-hidden="true">
             <svg className="route-loading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 6H6a4 4 0 0 0-4 4v3a4 4 0 0 0 4 4h1.5a3 3 0 0 1 2.5 1.5L11 20a1 1 0 0 0 2 0l1-1.5a3 3 0 0 1 2.5-1.5H18a4 4 0 0 0 4-4v-3a4 4 0 0 0-4-4z" />
+              <path d="M18 6H6a4 4 0 0 0-4 4v3a4 4 0 0 0 4 4h1.5a3 3 0 0 1 2.5 1.5L11 20a1 1 0 0 0 2 0l1-1.5a3 3 0 0 1 2.5-1.5H18a4 4 0 0 0 4-4v-3a4 4 0 0 0-4-4z" fill="currentColor" fillOpacity="0.15" />
               <path d="M6 12h4M8 10v4" />
-              <circle cx="15.5" cy="11.5" r="1" fill="currentColor" stroke="none" />
-              <circle cx="18" cy="13.5" r="1" fill="currentColor" stroke="none" />
+              <circle cx="15" cy="11.5" r="1" fill="currentColor" stroke="none" />
+              <circle cx="17.5" cy="13.5" r="1" fill="currentColor" stroke="none" />
             </svg>
           </div>
           <div className="route-loading-brand">

@@ -149,13 +149,6 @@ export const CATEGORIES: Category[] = [
     description: 'Simple one-tap games with addictive loops.',
   },
   {
-    slug: 'zombie',
-    name: 'Zombie',
-    icon: '🧟',
-    color: { bg: 'oklch(92% 0.04 130)', text: 'oklch(34% 0.14 130)' },
-    description: 'Survive waves of zombies and undead enemies.',
-  },
-  {
     slug: 'beauty',
     name: 'Beauty',
     icon: '💄',
@@ -196,13 +189,6 @@ export const CATEGORIES: Category[] = [
     icon: '🍄',
     color: { bg: 'oklch(94% 0.05 60)', text: 'oklch(38% 0.16 60)' },
     description: 'Jump, run, and explore side-scrolling worlds.',
-  },
-  {
-    slug: 'horror',
-    name: 'Horror',
-    icon: '👻',
-    color: { bg: 'oklch(91% 0.02 270)', text: 'oklch(32% 0.1 270)' },
-    description: 'Scary games and thrilling survival experiences.',
   },
 ];
 

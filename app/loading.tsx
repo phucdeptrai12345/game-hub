@@ -22,7 +22,7 @@ export default function Loading() {
 
         {/* Text */}
         <p className="text-lg font-black uppercase tracking-widest text-fg title-display mb-2">
-          Game<span className="text-accent">Zone</span>
+          Play<span className="text-accent">za</span>
         </p>
 
         {/* Animated dots */}

@@ -61,19 +61,19 @@ function MailIcon() {
 
 function TopicCard({ label, title, text }: { label: string; title: string; text: string }) {
   return (
-    <article className="rounded-[26px] border border-border bg-surface p-6 shadow-[0_18px_42px_oklch(18%_0.02_250/0.08)] transition-transform duration-300 ease-out hover:-translate-y-1 hover:border-accent/40">
-      <p className="mb-4 text-xs font-black uppercase tracking-wide text-accent">{label}</p>
-      <h2 className="text-2xl font-black leading-tight text-fg title-display">{title}</h2>
-      <p className="mt-3 text-sm font-semibold leading-7 text-muted">{text}</p>
+    <article className="rounded-2xl border border-border bg-surface p-5 shadow-[0_4px_16px_oklch(18%_0.02_250/0.06)] transition-all duration-200 ease-out hover:-translate-y-1 hover:border-accent/35 hover:shadow-[0_8px_24px_oklch(18%_0.02_250/0.10)]">
+      <p className="mb-3 text-xs font-black uppercase tracking-wide text-accent">{label}</p>
+      <h2 className="text-xl font-black leading-tight text-fg">{title}</h2>
+      <p className="mt-2.5 text-sm font-semibold leading-6 text-muted">{text}</p>
     </article>
   );
 }
 
 function SideBlock({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="rounded-[24px] border border-border bg-surface p-5 shadow-[0_18px_42px_oklch(18%_0.02_250/0.08)]">
-      <h2 className="text-lg font-black text-fg title-display">{title}</h2>
-      <div className="mt-4 text-sm font-semibold leading-7 text-muted">{children}</div>
+    <div className="rounded-xl border border-border bg-surface p-5">
+      <h2 className="text-base font-black text-fg">{title}</h2>
+      <div className="mt-3 text-sm font-semibold leading-7 text-muted">{children}</div>
     </div>
   );
 }
@@ -83,7 +83,7 @@ export default function ContactPage() {
 
   return (
     <div className="home-pattern min-h-screen w-full px-4 py-10 sm:px-6 lg:px-8 xl:px-12">
-      <section className="relative overflow-hidden rounded-[34px] border border-border bg-surface px-6 py-10 shadow-[0_24px_60px_oklch(18%_0.02_250/0.10)] sm:px-8 lg:px-10">
+      <section className="relative overflow-hidden rounded-3xl border border-border bg-surface px-6 py-10 shadow-[0_8px_32px_oklch(18%_0.02_250/0.08)] sm:px-8 lg:px-10">
         <div
           className="absolute right-[-8%] top-[-20%] h-[145%] w-[38%] rotate-[-12deg] bg-accent/12"
           aria-hidden="true"
@@ -116,7 +116,7 @@ export default function ContactPage() {
               {CONTACT_EMAIL}
             </a>
             <p className="mt-4 text-sm font-bold leading-7 text-muted">
-              We read incoming messages and usually reply within 1-3 business days. Complex rights or partnership requests may take longer.
+              Most messages get a reply within 1–2 business days. Rights and legal requests may take longer.
             </p>
           </aside>
         </div>
@@ -139,7 +139,7 @@ export default function ContactPage() {
             ))}
           </div>
 
-          <section className="mt-6 rounded-[30px] border border-border bg-[oklch(15%_0.035_276)] p-7 text-white shadow-[0_24px_60px_oklch(8%_0.02_276/0.20)]">
+          <section className="mt-5 rounded-2xl border border-border bg-[oklch(15%_0.035_276)] p-6 text-white shadow-[0_8px_28px_oklch(8%_0.02_276/0.16)]">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
               <div>
                 <p className="mb-2 text-sm font-black uppercase tracking-[0.14em] text-accent">Ready to send?</p>
@@ -153,7 +153,7 @@ export default function ContactPage() {
               </div>
               <a
                 href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(mailSubject)}`}
-                className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-6 text-sm font-black text-white transition-colors hover:bg-accent-hover"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-6 text-sm font-bold text-white transition-colors hover:bg-accent-hover"
               >
                 Send email
               </a>
@@ -175,13 +175,13 @@ export default function ContactPage() {
 
           <SideBlock title="Related pages">
             <div className="grid gap-2">
-              <Link href="/about" className="rounded-xl border border-border bg-background px-4 py-3 font-black text-fg transition-colors hover:border-accent/40 hover:text-accent">
+              <Link href="/about" className="rounded-xl border border-border bg-background px-4 py-3 font-bold text-fg transition-colors hover:border-accent/40 hover:text-accent">
                 About GameZone
               </Link>
-              <Link href="/privacy" className="rounded-xl border border-border bg-background px-4 py-3 font-black text-fg transition-colors hover:border-accent/40 hover:text-accent">
+              <Link href="/privacy" className="rounded-xl border border-border bg-background px-4 py-3 font-bold text-fg transition-colors hover:border-accent/40 hover:text-accent">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="rounded-xl border border-border bg-background px-4 py-3 font-black text-fg transition-colors hover:border-accent/40 hover:text-accent">
+              <Link href="/terms" className="rounded-xl border border-border bg-background px-4 py-3 font-bold text-fg transition-colors hover:border-accent/40 hover:text-accent">
                 Terms of Use
               </Link>
             </div>

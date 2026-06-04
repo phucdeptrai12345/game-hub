@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 interface Props {
   slot: string;
@@ -25,8 +26,14 @@ const AD_SLOT_IDS: Record<string, string | undefined> = {
 
 const variantClass = {
   leaderboard: 'min-h-[90px]',
-  infeed: 'min-h-[120px]',
-  rectangle: 'min-h-[250px]',
+  infeed:      'min-h-[120px]',
+  rectangle:   'min-h-[250px]',
+};
+
+const insMinHeight = {
+  leaderboard:  90,
+  infeed:       120,
+  rectangle:    250,
 };
 
 declare global {
@@ -36,6 +43,7 @@ declare global {
 }
 
 export default function AdSlot({ slot, variant = 'leaderboard', className = '' }: Props) {
+  const { t } = useI18n();
   const [adsConsent, setAdsConsent] = useState(false);
   const resolvedSlot = AD_SLOT_IDS[slot] || (/^\d+$/.test(slot) ? slot : undefined);
   const canRenderAd = Boolean(ADSENSE_CLIENT && resolvedSlot && adsConsent);
@@ -73,7 +81,8 @@ export default function AdSlot({ slot, variant = 'leaderboard', className = '' }
     >
       {canRenderAd ? (
         <ins
-          className="adsbygoogle block h-full w-full"
+          className="adsbygoogle block w-full"
+          style={{ display: 'block', minHeight: insMinHeight[variant] }}
           data-ad-client={ADSENSE_CLIENT}
           data-ad-slot={resolvedSlot}
           data-ad-format="auto"
@@ -83,7 +92,7 @@ export default function AdSlot({ slot, variant = 'leaderboard', className = '' }
         <div className="flex h-full min-h-[inherit] items-center justify-center px-4 text-center">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-muted">
-              Advertisement
+              {t('ad.label')}
             </p>
           </div>
         </div>

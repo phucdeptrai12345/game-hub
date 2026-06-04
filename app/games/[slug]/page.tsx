@@ -10,6 +10,7 @@ import AdSlot from '@/components/ui/AdSlot';
 import GameImage from '@/components/ui/GameImage';
 import Link from 'next/link';
 import { slugify } from '@/lib/utils';
+import GamePageAnimations from '@/components/game/GamePageAnimations';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   const games = await getAllGames();
-  return games.slice(0, 200).map((g) => ({ slug: g.slug }));
+  return games.slice(0, 1000).map((g) => ({ slug: g.slug }));
 }
 
 export default async function GamePage({ params }: Props) {
@@ -53,9 +54,10 @@ export default async function GamePage({ params }: Props) {
 
   return (
     <div className="w-full">
+      <GamePageAnimations />
       {/* Hero background — blurred thumbnail */}
       {game.thumb && (
-        <div className="absolute top-16 left-0 right-0 h-64 overflow-hidden pointer-events-none -z-0" aria-hidden>
+        <div className="absolute top-16 left-0 right-0 h-64 overflow-hidden pointer-events-none -z-10" aria-hidden>
           <img src={game.thumb} alt="" className="w-full h-full object-cover blur-2xl scale-110 opacity-20" />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background" />
         </div>
@@ -79,12 +81,14 @@ export default async function GamePage({ params }: Props) {
             <h1 className="text-2xl md:text-3xl font-black text-fg leading-tight">
               {game.title}
             </h1>
-            <CategoryBadge category={game.category} className="self-start sm:mt-1 sm:shrink-0" />
+            <CategoryBadge category={game.category} className="category-badge self-start sm:mt-1 sm:shrink-0" />
           </div>
 
           {/* Description */}
           {game.description && (
-            <GameDescription text={game.description} />
+            <div className="game-description">
+              <GameDescription text={game.description} />
+            </div>
           )}
 
           {/* How to play */}
@@ -93,8 +97,8 @@ export default async function GamePage({ params }: Props) {
           )}
 
           {game.developer && (
-            <p className="text-xs text-muted font-semibold mt-4">
-              Developer: <span className="text-fg font-bold">{game.developer}</span>
+            <p className="text-xs text-muted mt-4">
+              Developer: <span className="text-fg font-semibold">{game.developer}</span>
             </p>
           )}
         </div>
@@ -109,7 +113,7 @@ export default async function GamePage({ params }: Props) {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <span className="w-1 h-5 rounded-full bg-accent" aria-hidden="true" />
-                <p className="text-xs font-black text-fg uppercase tracking-widest">
+                <p className="text-sm font-black text-fg uppercase tracking-wide">
                   More {game.category} Games
                 </p>
               </div>
@@ -151,12 +155,12 @@ export default async function GamePage({ params }: Props) {
 
           <div className="flex items-center gap-3 mb-6">
             <span className="w-1.5 h-6 rounded-full bg-accent" aria-hidden="true" />
-            <h2 className="text-xl font-black text-fg title-display uppercase tracking-tight">
-              More Games
+            <h2 className="more-games-heading text-xl font-black text-fg title-display uppercase tracking-tight">
+              More {game.category} Games
             </h2>
             <Link
               href={`/category/${slugify(game.category)}`}
-              className="link-red-action text-sm font-black"
+              className="link-red-action text-sm font-bold"
             >
               See all →
             </Link>
@@ -166,9 +170,9 @@ export default async function GamePage({ params }: Props) {
               <Link
                 key={g.id}
                 href={`/games/${g.slug}`}
-                className="group flex flex-col gap-1.5 active-click"
+                className="more-games-card group flex flex-col gap-1.5 active-click"
               >
-                <div className="relative w-full rounded-xl overflow-hidden bg-border/40 aspect-square">
+                <div className="relative w-full rounded-lg overflow-hidden bg-border/40 aspect-square">
                   <GameImage
                     game={g}
                     alt={g.title}

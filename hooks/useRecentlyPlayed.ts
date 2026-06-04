@@ -9,6 +9,9 @@ export function saveRecentlyPlayed(game: Game): void {
     const stored = readStoredGames(KEY);
     const next = [game, ...stored.filter((g) => g.id !== game.id)].slice(0, MAX);
     writeStoredGames(KEY, next);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('gz-recent-changed'));
+    }
   } catch {}
 }
 

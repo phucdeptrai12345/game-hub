@@ -5,6 +5,7 @@ import GameGrid from '@/components/ui/GameGrid';
 import Link from 'next/link';
 import { CATEGORIES } from '@/constants/categories';
 import type { Metadata } from 'next';
+import SearchAnimations from './SearchAnimations';
 
 export const revalidate = 3600;
 
@@ -17,7 +18,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const q = params.q ?? '';
   return {
     title: q ? `"${q}" — Search` : 'Search Games',
-    description: 'Find free online HTML5 games by name, category, or tag.',
+    description: 'Search hundreds of free HTML5 games by name, genre, or tag — no download needed.',
   };
 }
 
@@ -31,17 +32,18 @@ export default async function SearchPage({ searchParams }: Props) {
 
   return (
     <div className="w-full px-3 sm:px-4 lg:px-5 xl:px-6 py-10">
+      <SearchAnimations />
 
       {/* Header + search */}
       <div className="mb-10">
-        <h1 className="text-3xl font-black text-fg mb-5">
+        <h1 className="search-heading text-3xl font-black text-fg mb-5">
           {query ? (
             <>
               Results for{' '}
               <span className="text-accent">&ldquo;{query}&rdquo;</span>
             </>
           ) : (
-            'Search Games'
+            'What are you looking for?'
           )}
         </h1>
         <div className="max-w-lg">
@@ -52,10 +54,12 @@ export default async function SearchPage({ searchParams }: Props) {
       {query ? (
         results.length > 0 ? (
           <>
-            <p className="text-muted text-sm font-bold mb-6" aria-live="polite" aria-atomic="true">
+            <p className="search-result-count text-muted text-sm font-bold mb-6" aria-live="polite" aria-atomic="true">
               {results.length.toLocaleString()} game{results.length !== 1 ? 's' : ''} found
             </p>
-            <GameGrid games={results} priorityCount={8} />
+            <div className="search-results">
+              <GameGrid games={results} priorityCount={8} />
+            </div>
           </>
         ) : (
           <NoResults query={query} />
@@ -76,14 +80,14 @@ function NoResults({ query }: { query: string }) {
           Nothing for &ldquo;{query}&rdquo;
         </p>
         <p className="text-muted font-semibold mt-2 mb-8 max-w-xs mx-auto leading-relaxed">
-          Check the spelling, or pick a category below to browse instead.
+          Double-check the spelling, or pick a category to explore instead.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <Link
             href="/games"
             className="px-6 py-3 bg-accent hover:bg-accent-hover text-white font-bold rounded-xl transition-colors duration-150"
           >
-            Browse all games
+            Browse all games →
           </Link>
           <Link
             href="/"
@@ -96,9 +100,9 @@ function NoResults({ query }: { query: string }) {
 
       <div>
         <p className="text-xs font-bold text-muted uppercase tracking-widest mb-4 text-center">
-          Browse by category
+          Or jump to a category
         </p>
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="search-category-chips flex flex-wrap justify-center gap-2">
           {CATEGORIES.map((cat) => (
             <Link
               key={cat.slug}
@@ -118,15 +122,15 @@ function NoResults({ query }: { query: string }) {
 function EmptySearch() {
   return (
     <div className="py-16">
-      <p className="text-2xl font-black text-fg mb-2">Find your next game</p>
+      <p className="text-2xl font-bold text-fg mb-2">Hundreds of free games, one search away</p>
       <p className="text-muted font-semibold mb-10 max-w-sm leading-relaxed">
-        Type a game name, category, or tag above — results appear as you type.
+        Try a game name, a genre like &ldquo;racing&rdquo;, or a vibe like &ldquo;relaxing&rdquo;.
       </p>
 
       <p className="text-xs font-bold text-muted uppercase tracking-widest mb-4">
-        Or browse by category
+        Jump to a category
       </p>
-      <div className="flex flex-wrap gap-2">
+      <div className="search-category-chips flex flex-wrap gap-2">
         {CATEGORIES.map((cat) => (
           <Link
             key={cat.slug}

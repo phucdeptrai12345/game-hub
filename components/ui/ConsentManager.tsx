@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 const CONSENT_KEY = 'gz_ads_consent';
 const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
@@ -23,6 +24,7 @@ function loadAdSense() {
 }
 
 export default function ConsentManager() {
+  const { t } = useI18n();
   const [consent, setConsent] = useState<Consent>('unknown');
 
   useEffect(() => {
@@ -47,13 +49,12 @@ export default function ConsentManager() {
   return (
     <div className="fixed inset-x-3 bottom-3 z-[80] mx-auto max-w-3xl rounded-2xl border border-border bg-surface/96 p-4 shadow-[0_18px_48px_oklch(8%_0.01_250/0.22)] backdrop-blur-md sm:bottom-5 sm:flex sm:items-center sm:gap-4">
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-black text-fg">Ads and privacy</p>
+        <p className="text-sm font-black text-fg">{t('consent.title')}</p>
         <p className="mt-1 text-xs font-bold leading-relaxed text-muted">
-          We use ads to keep GameZone free. With your consent, Google may use cookies or similar
-          storage for personalized ads. You can decline and still play.
+          {t('consent.text')}
           {' '}
           <Link href="/privacy" className="text-accent hover:underline">
-            Privacy Policy
+            {t('footer.privacy')}
           </Link>
         </p>
       </div>
@@ -63,14 +64,14 @@ export default function ConsentManager() {
           onClick={() => choose('declined')}
           className="rounded-full border border-border bg-navy px-4 py-2 text-xs font-black text-muted transition-colors hover:text-fg"
         >
-          Decline
+          {t('consent.decline')}
         </button>
         <button
           type="button"
           onClick={() => choose('accepted')}
           className="rounded-full bg-accent px-4 py-2 text-xs font-black text-white transition-colors hover:bg-accent-hover"
         >
-          Accept
+          {t('consent.accept')}
         </button>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { CATEGORIES } from '@/constants/categories';
 import CategoryIcon from '@/components/ui/CategoryIcon';
 import { getRecentlyPlayed } from '@/hooks/useRecentlyPlayed';
 import { useSidebar } from '@/components/providers/SidebarProvider';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 const HomeIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -22,6 +23,22 @@ const PopularIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
     <path d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+  </svg>
+);
+const AboutIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 16v-4" />
+    <path d="M12 8h.01" />
+  </svg>
+);
+const KidsIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <rect x="4" y="5" width="16" height="16" rx="7" />
+    <path d="M5 6.5 3.5 4M19 6.5 20.5 4" />
+    <circle cx="9" cy="10" r="1" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="10" r="1" fill="currentColor" stroke="none" />
+    <path d="M8 15s1.5 2 4 2 4-2 4-2" />
   </svg>
 );
 const MultiIcon = () => (
@@ -57,12 +74,14 @@ const HeartIcon = () => (
 );
 
 const NAV_ITEMS = [
-  { label: 'Home',        href: '/',                     Icon: HomeIcon },
-  { label: 'New Games',   href: '/games?sort=new',        Icon: NewIcon },
-  { label: 'All Games',   href: '/games',                Icon: PopularIcon },
-  { label: 'Multiplayer', href: '/category/multiplayer', Icon: MultiIcon },
-  { label: '2 Player',    href: '/category/2player',     Icon: TwoPlayerIcon },
-  { label: 'Favorites',   href: '/favorites',            Icon: HeartIcon },
+  { labelKey: 'nav.home',        href: '/',                     Icon: HomeIcon },
+  { labelKey: 'nav.newGames',    href: '/games?sort=new',        Icon: NewIcon },
+  { labelKey: 'nav.allGames',    href: '/games',                Icon: PopularIcon },
+  { labelKey: 'nav.forKids',     href: '/kids-site',            Icon: KidsIcon },
+  { labelKey: 'nav.multiplayer', href: '/category/multiplayer', Icon: MultiIcon },
+  { labelKey: 'nav.twoPlayer',   href: '/category/2player',     Icon: TwoPlayerIcon },
+  { labelKey: 'nav.favorites',   href: '/favorites',            Icon: HeartIcon },
+  { labelKey: 'nav.about',       href: '/about',                Icon: AboutIcon },
 ];
 
 const SIDEBAR_CATEGORY_SLUGS = [
@@ -84,7 +103,7 @@ const SIDEBAR_CATEGORIES = CATEGORIES.filter((cat) =>
 
 function NavItem({
   href, label, active, children,
-}: { href: string; label: string; active: boolean; children: React.ReactNode }) {
+}: { href: string; label: string; active: boolean; children: React.ReactNode; }) {
   return (
     <Link
       href={href}
@@ -120,11 +139,18 @@ function SidebarInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { hidden, toggle } = useSidebar();
+  const { t } = useI18n();
   const [hasRecent, setHasRecent] = useState(false);
 
   useEffect(() => {
     setHasRecent(getRecentlyPlayed().length > 0);
   }, [pathname]);
+
+  useEffect(() => {
+    const onChanged = () => setHasRecent(getRecentlyPlayed().length > 0);
+    window.addEventListener('gz-recent-changed', onChanged);
+    return () => window.removeEventListener('gz-recent-changed', onChanged);
+  }, []);
 
   function isNavActive(href: string) {
     if (href === '/') return pathname === '/';
@@ -141,16 +167,11 @@ function SidebarInner() {
   return (
     <div className={`hidden lg:block shrink-0 transition-[width] duration-200 ${hidden ? 'w-0' : 'w-16'}`}>
       <div className={hidden ? '' : 'group/sidebar'}>
-
-      {/* Backdrop — only when visible */}
-      {!hidden && (
-        <div className="fixed inset-0 z-30 bg-black/50 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 pointer-events-none" />
-      )}
-
-      <aside className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-surface border-r border-border z-40 transition-[width] duration-200 ease-out overflow-hidden flex flex-col shadow-[4px_0_24px_oklch(10%_0.01_250/0.08)] ${
-        hidden ? 'w-0' : 'w-16 group-hover/sidebar:w-56'
+      <aside className={`fixed top-16 left-0 h-[calc(100vh-4rem)] z-40 transition-[width,background-color,box-shadow] duration-200 ease-out overflow-hidden flex flex-col ${
+        hidden
+          ? 'w-0 bg-transparent'
+          : 'w-16 bg-transparent group-hover/sidebar:w-56 group-hover/sidebar:bg-surface group-hover/sidebar:border-r group-hover/sidebar:border-border group-hover/sidebar:shadow-[4px_0_24px_oklch(10%_0.01_250/0.08)]'
       }`}>
-
         <div className="w-56 min-w-[224px] h-full overflow-y-auto scrollbar-hidden flex flex-col py-3 gap-1.5">
 
           {/* Nav items — hidden when sidebar is toggled off */}
@@ -158,8 +179,8 @@ function SidebarInner() {
             <>
               {/* Nav items */}
               <SectionLabel>Main</SectionLabel>
-              {NAV_ITEMS.map(({ label, href, Icon }) => (
-                <NavItem key={href} href={href} label={label} active={isNavActive(href)}>
+              {NAV_ITEMS.map(({ labelKey, href, Icon }) => (
+                <NavItem key={href} href={href} label={t(labelKey)} active={isNavActive(href)}>
                   <Icon />
                 </NavItem>
               ))}
@@ -184,7 +205,7 @@ function SidebarInner() {
                   )}
                 </span>
                 <span className="ml-2 whitespace-nowrap pr-4 opacity-0 transition-opacity duration-150 delay-75 group-hover/sidebar:opacity-100">
-                  Recently Played
+                  {t('nav.recentlyPlayed')}
                 </span>
               </Link>
 
@@ -213,7 +234,7 @@ function SidebarInner() {
                       <CategoryIcon slug={cat.slug} size={22} />
                     </span>
                     <span className="ml-2 whitespace-nowrap pr-4 opacity-0 transition-opacity duration-150 delay-75 group-hover/sidebar:opacity-100">
-                      {cat.name}
+                      {t(`cat.${cat.slug}`, cat.name)}
                     </span>
                   </Link>
                 );
@@ -235,7 +256,7 @@ function SidebarInner() {
                   <TagIcon />
                 </span>
                 <span className="ml-2 whitespace-nowrap pr-4 opacity-0 transition-opacity duration-150 delay-75 group-hover/sidebar:opacity-100">
-                  More categories
+                  {t('nav.moreCategories')}
                 </span>
               </Link>
 
@@ -251,7 +272,7 @@ function SidebarInner() {
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" aria-hidden>
                     <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                   </svg>
-                  Contact us
+                  {t('nav.contact')}
                 </Link>
               </div>
 
@@ -294,7 +315,7 @@ function SidebarInner() {
               {/* Copyright */}
               <div className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-150 delay-75 px-4 pb-4">
                 <p className="text-[11px] text-muted/60 font-semibold whitespace-nowrap">
-                  © {new Date().getFullYear()} GameZone
+                  (c) {new Date().getFullYear()} GameZone
                 </p>
               </div>
             </>

@@ -15,14 +15,16 @@ const ThemeContext = createContext<ThemeContextType>({
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [theme, setTheme] = useState<Theme>('dark');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const saved = (localStorage.getItem('theme') as Theme) || 'light';
+    const saved = (localStorage.getItem('theme') as Theme) || 'dark';
     setTheme(saved);
     if (saved === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
     }
     setMounted(true);
   }, []);

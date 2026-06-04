@@ -1,17 +1,19 @@
 import type { Metadata, Viewport } from 'next';
-import { Nunito, Russo_One } from 'next/font/google';
+import { Nunito, Russo_One, Exo_2 } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
+import Footer from '@/components/layout/Footer';
 import TopLoadingBar from '@/components/ui/TopLoadingBar';
 import BackToTopButton from '@/components/ui/BackToTopButton';
 import ConsentManager from '@/components/ui/ConsentManager';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { SidebarProvider } from '@/components/providers/SidebarProvider';
+import { I18nProvider } from '@/components/providers/I18nProvider';
 import { SITE_URL } from '@/lib/site';
 
 const nunito = Nunito({
-  subsets: ['latin'],
+  subsets: ['latin', 'vietnamese'],
   weight: ['400', '600', '700', '800', '900'],
   variable: '--font-nunito',
   display: 'swap',
@@ -21,6 +23,13 @@ const russoOne = Russo_One({
   subsets: ['latin'],
   weight: '400',
   variable: '--font-russo-one',
+  display: 'swap',
+});
+
+const exo2 = Exo_2({
+  subsets: ['latin'],
+  weight: ['700', '800', '900'],
+  variable: '--font-exo2',
   display: 'swap',
 });
 
@@ -54,7 +63,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${nunito.variable} ${russoOne.variable} h-full bg-background`}>
+    <html lang="en" data-theme="dark" data-scroll-behavior="smooth" className={`${nunito.variable} ${russoOne.variable} ${exo2.variable} h-full bg-background`}>
       <body className="min-h-full flex flex-col text-fg antialiased">
         <a
           href="#main-content"
@@ -62,18 +71,23 @@ export default function RootLayout({
         >
           Skip to content
         </a>
+        <I18nProvider>
         <ThemeProvider>
           <SidebarProvider>
           <TopLoadingBar />
           <Navbar />
           <div className="flex flex-1">
             <Sidebar />
-            <main id="main-content" className="w-full min-w-0 flex-1 overflow-x-clip">{children}</main>
+            <main id="main-content" className="w-full min-w-0 flex-1 overflow-x-clip">
+              {children}
+              <Footer />
+            </main>
           </div>
           <BackToTopButton />
           <ConsentManager />
           </SidebarProvider>
         </ThemeProvider>
+        </I18nProvider>
       </body>
     </html>
   );

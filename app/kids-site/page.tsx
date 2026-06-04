@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
 import KidsPickerButton from './KidsPickerButton';
+import KidsFilterTabs, { type KidsFilter } from './KidsFilterTabs';
+import KidsAnimations from './KidsAnimations';
 import GameImage from '@/components/ui/GameImage';
 import { getAllGames } from '@/lib/gamemonetize';
 import { Game } from '@/lib/types';
@@ -60,14 +62,12 @@ const BLOCKED_WORDS = [
 ];
 
 const DOODLES = [
-  { kind: 'ball', color: '#ef4c44', className: 'kids-doodle-large' },
-  { kind: 'car', color: '#ff9a3d', className: 'kids-doodle-small' },
-  { kind: 'gamepad', color: '#ef4c44', className: 'kids-doodle-large' },
-  { kind: 'rocket', color: '#41b883', className: 'kids-doodle-large' },
-  { kind: 'skate', color: '#ffb30f', className: 'kids-doodle-large' },
-  { kind: 'soccer', color: '#ef4c44', className: 'kids-doodle-large' },
-  { kind: 'bike', color: '#4f7cff', className: 'kids-doodle-small' },
-  { kind: 'robot', color: '#41b883', className: 'kids-doodle-large' },
+  { kind: 'star',    color: '#ffb30f', className: 'kids-doodle-large', anim: 'kids-hover-spin' },
+  { kind: 'gamepad', color: '#ef4c44', className: 'kids-doodle-large', anim: 'kids-hover-shake' },
+  { kind: 'rocket',  color: '#41b883', className: 'kids-doodle-large', anim: 'kids-hover-launch' },
+  { kind: 'rainbow', color: '#4f7cff', className: 'kids-doodle-large', anim: 'kids-hover-sway' },
+  { kind: 'heart',   color: '#ef4c44', className: 'kids-doodle-large', anim: 'kids-hover-pulse' },
+  { kind: 'crown',   color: '#ffb30f', className: 'kids-doodle-large', anim: 'kids-hover-bounce' },
 ] as const;
 
 function uniqueById(games: Game[]) {
@@ -100,6 +100,13 @@ function bySlugs(games: Game[], slugs: string[]) {
   return games.filter((game) => gameSlugs(game).some((slug) => targets.has(slug)));
 }
 
+function byWords(games: Game[], words: string[]) {
+  return games.filter((game) => {
+    const text = [game.title, game.category, game.description, ...game.tags].join(' ').toLowerCase();
+    return words.some((word) => text.includes(word));
+  });
+}
+
 function KidsGameTile({
   game,
   priority = false,
@@ -129,14 +136,17 @@ function DoodleIcon({
   kind,
   color,
   className,
+  anim,
 }: {
   kind: string;
   color: string;
   className?: string;
+  anim?: string;
 }) {
   const doodleStyle = { color } as CSSProperties;
+  const doodleClass = `kids-doodle ${className ?? ''} ${anim ?? ''}`.trim();
   const common = {
-    className: `kids-doodle ${className ?? ''}`,
+    className: doodleClass,
     viewBox: '0 0 64 64',
     fill: 'none',
     stroke: 'currentColor',
@@ -148,28 +158,23 @@ function DoodleIcon({
   };
 
   switch (kind) {
-    case 'ball':
+    case 'star':
       return (
         <svg {...common}>
-          <circle cx="32" cy="32" r="22" className="kids-doodle-fill" />
-          <path d="M11 31c12 1 23-5 31-18" />
-          <path d="M22 52c-1-16 8-29 26-36" />
-          <path d="M14 43c15-2 28 2 38 11" />
-          <path d="M19 22c2.3-3.3 5.7-5.5 10-6.4" className="kids-doodle-detail" />
-          <circle cx="45" cy="47" r="1.7" className="kids-doodle-dot" />
+          <path d="M32 9 L37 24 L53 24 L41 34 L45 50 L32 41 L19 50 L23 34 L11 24 L27 24 Z" className="kids-doodle-fill" />
+          <path d="M32 9 L37 24 L53 24 L41 34 L45 50 L32 41 L19 50 L23 34 L11 24 L27 24 Z" />
+          <circle cx="32" cy="32" r="4" className="kids-doodle-dot" />
+          <circle cx="43" cy="17" r="2" className="kids-doodle-dot" />
         </svg>
       );
-    case 'car':
+    case 'lollipop':
       return (
         <svg {...common}>
-          <path d="M12 39h40l-4-12c-.5-1.5-1.7-2.5-3.3-2.5H23.5c-1.5 0-2.7.8-3.5 2.1L12 39Z" className="kids-doodle-fill" />
-          <path d="M24 24l5-7h14l5 7" />
-          <path d="M28 24h15M18 39h32" />
-          <circle cx="22" cy="43" r="5.2" />
-          <circle cx="46" cy="43" r="5.2" />
-          <circle cx="22" cy="43" r="1.8" className="kids-doodle-dot" />
-          <circle cx="46" cy="43" r="1.8" className="kids-doodle-dot" />
-          <path d="M27 30h10M43 31h3.5M15 35h4" className="kids-doodle-detail" />
+          <circle cx="32" cy="24" r="15" className="kids-doodle-fill" />
+          <circle cx="32" cy="24" r="15" />
+          <line x1="32" y1="38" x2="35" y2="57" />
+          <path d="M32 12 Q42 15 43 24 Q42 34 32 36" className="kids-doodle-detail" />
+          <circle cx="32" cy="24" r="5" className="kids-doodle-dot" />
         </svg>
       );
     case 'gamepad':
@@ -178,64 +183,91 @@ function DoodleIcon({
           <path d="M17 26h30c7 0 12 5 12 12v3c0 5.4-4.2 9.3-9.2 9.3-4 0-6.9-2-9.2-5.4H23.4c-2.3 3.4-5.2 5.4-9.2 5.4C9.2 50.3 5 46.4 5 41v-3c0-7 5-12 12-12Z" className="kids-doodle-fill" />
           <path d="M18.5 38h10M23.5 33v10" />
           <path d="M28 26c.8-4.2 2.1-6.4 4-6.4s3.2 2.2 4 6.4" className="kids-doodle-detail" />
-          <circle cx="42.5" cy="36" r="2.1" className="kids-doodle-dot" />
-          <circle cx="50" cy="41" r="2.1" className="kids-doodle-dot" />
-          <circle cx="48.5" cy="34" r="1.4" className="kids-doodle-dot" />
+          <circle cx="42.5" cy="36" r="2.5" className="kids-doodle-dot" />
+          <circle cx="50" cy="41" r="2.5" className="kids-doodle-dot" />
+          <circle cx="48.5" cy="34" r="1.8" className="kids-doodle-dot" />
         </svg>
       );
     case 'rocket':
       return (
         <svg {...common}>
-          <path d="M35 8c9.5 5.4 14.2 15.4 13.4 29.5L34.5 52 20 37.5C20 23.5 25.2 13.4 35 8Z" className="kids-doodle-fill" />
-          <circle cx="36" cy="27" r="5.2" />
-          <circle cx="36" cy="27" r="2" className="kids-doodle-dot" />
-          <path d="M21 37.5l-9.5 4.8 12.2 12.2 4.8-9.5M46.5 35.5l6.5 2.3-7.3 7.4" />
-          <path d="M28 43.5c4.4-1.1 8-4 10.8-8.7" className="kids-doodle-detail" />
-          <path d="M48 38l7 7M42 46l7.5 7.5M20 50l-4 7" />
+          {/* Nose cone */}
+          <path d="M22 30 L32 8 L42 30 Z" className="kids-doodle-fill" />
+          <path d="M22 30 L32 8 L42 30" />
+          {/* Body */}
+          <rect x="22" y="29" width="20" height="22" rx="3" className="kids-doodle-fill" />
+          <rect x="22" y="29" width="20" height="22" rx="3" />
+          {/* Left fin */}
+          <path d="M22 44 L13 55 L22 50 Z" className="kids-doodle-fill" />
+          <path d="M22 44 L13 55 L22 50" />
+          {/* Right fin */}
+          <path d="M42 44 L51 55 L42 50 Z" className="kids-doodle-fill" />
+          <path d="M42 44 L51 55 L42 50" />
+          {/* Window */}
+          <circle cx="32" cy="38" r="5.5" />
+          <circle cx="32" cy="38" r="2.5" className="kids-doodle-dot" />
+          {/* Flame */}
+          <path d="M25 54 Q29 63 32 57 Q35 63 39 54" strokeWidth="3.5" />
         </svg>
       );
-    case 'skate':
+    case 'rainbow': {
       return (
-        <svg {...common}>
-          <path d="M13 24c8 14 21 20.5 38 17.5" className="kids-doodle-fill" />
-          <path d="M22 21c9 14 19 20 31 20" />
-          <path d="M31 18l14 27" />
-          <circle cx="25" cy="47" r="4.2" />
-          <circle cx="48" cy="45" r="4.2" />
-          <circle cx="25" cy="47" r="1.5" className="kids-doodle-dot" />
-          <circle cx="48" cy="45" r="1.5" className="kids-doodle-dot" />
-          <path d="M17 28c8.5.5 16-2 22.5-7.5M32 41h11" className="kids-doodle-detail" />
+        <svg className={doodleClass} viewBox="0 0 64 64" fill="none" strokeLinecap="round" style={doodleStyle} aria-hidden>
+          <path d="M6 48 A26 26 0 0 1 58 48" stroke="#ef4c44" strokeWidth="3.8" />
+          <path d="M12 48 A20 20 0 0 1 52 48" stroke="#ff9a3d" strokeWidth="3.8" />
+          <path d="M18 48 A14 14 0 0 1 46 48" stroke="#41b883" strokeWidth="3.8" />
+          <path d="M24 48 A8 8 0 0 1 40 48" stroke="#4f7cff" strokeWidth="3.8" />
+          <circle cx="4"  cy="49" r="5"   fill={`${color}22`} stroke={color} strokeWidth="2.2" />
+          <circle cx="9"  cy="45" r="4"   fill={`${color}22`} stroke={color} strokeWidth="2.2" />
+          <circle cx="1"  cy="45" r="3.2" fill={`${color}22`} stroke={color} strokeWidth="2" />
+          <circle cx="60" cy="49" r="5"   fill={`${color}22`} stroke={color} strokeWidth="2.2" />
+          <circle cx="55" cy="45" r="4"   fill={`${color}22`} stroke={color} strokeWidth="2.2" />
+          <circle cx="63" cy="45" r="3.2" fill={`${color}22`} stroke={color} strokeWidth="2" />
         </svg>
       );
-    case 'soccer':
+    }
+    case 'heart':
       return (
         <svg {...common}>
-          <circle cx="32" cy="32" r="22" className="kids-doodle-fill" />
-          <path d="M32 20l10 7-4 12H26l-4-12 10-7Z" />
-          <path d="M22 27l-8-3M42 27l8-3M26 39l-5 9M38 39l5 9" />
-          <path d="M32 20v-9M14 24c2.5-4.8 6.3-8.4 11.4-10.6M50 40c-2.8 5.3-7.1 9-12.8 11" className="kids-doodle-detail" />
+          <path d="M32 52 C14 40 7 28 7 20 C7 13 12 8 20 8 C25.5 8 29.5 11 32 16 C34.5 11 38.5 8 44 8 C52 8 57 13 57 20 C57 28 50 40 32 52Z" className="kids-doodle-fill" />
+          <path d="M32 52 C14 40 7 28 7 20 C7 13 12 8 20 8 C25.5 8 29.5 11 32 16 C34.5 11 38.5 8 44 8 C52 8 57 13 57 20 C57 28 50 40 32 52Z" />
+          <circle cx="21" cy="18" r="3.5" className="kids-doodle-dot" />
         </svg>
       );
-    case 'bike':
+    case 'butterfly':
       return (
         <svg {...common}>
-          <circle cx="18" cy="43" r="9.5" className="kids-doodle-fill" />
-          <circle cx="49" cy="43" r="9.5" className="kids-doodle-fill" />
-          <path d="M18 43l10-18h9l12 18M28 25l11 18H18" />
-          <path d="M18 33.5v19M8.5 43h19M49 33.5v19M39.5 43h19" className="kids-doodle-detail" />
-          <path d="M35 25l7-8h8M30 18h-8M28 25l-4-7" />
-          <circle cx="37" cy="25" r="1.6" className="kids-doodle-dot" />
+          <path d="M32 30 Q18 12 10 20 Q5 30 20 34 Z" className="kids-doodle-fill" />
+          <path d="M32 30 Q46 12 54 20 Q59 30 44 34 Z" className="kids-doodle-fill" />
+          <path d="M32 36 Q14 42 14 50 Q16 57 26 50 Z" className="kids-doodle-fill" />
+          <path d="M32 36 Q50 42 50 50 Q48 57 38 50 Z" className="kids-doodle-fill" />
+          <path d="M32 22 Q30 33 32 44 Q34 33 32 22" strokeWidth="3.5" />
+          <path d="M32 22 Q26 14 22 10" />
+          <path d="M32 22 Q38 14 42 10" />
+          <circle cx="22" cy="10" r="2.5" className="kids-doodle-dot" />
+          <circle cx="42" cy="10" r="2.5" className="kids-doodle-dot" />
+          <circle cx="17" cy="24" r="3" className="kids-doodle-detail" />
+          <circle cx="47" cy="24" r="3" className="kids-doodle-detail" />
+        </svg>
+      );
+    case 'crown':
+      return (
+        <svg {...common}>
+          <path d="M9 46 L9 30 L19 40 L32 16 L45 40 L55 30 L55 46 Z" className="kids-doodle-fill" />
+          <path d="M9 46 L9 30 L19 40 L32 16 L45 40 L55 30 L55 46 Z" />
+          <path d="M9 40 H55" />
+          <circle cx="32" cy="24" r="4"   className="kids-doodle-dot" />
+          <circle cx="19" cy="39" r="3"   className="kids-doodle-dot" />
+          <circle cx="45" cy="39" r="3"   className="kids-doodle-dot" />
+          <circle cx="9"  cy="43" r="2.2" className="kids-doodle-dot" />
+          <circle cx="55" cy="43" r="2.2" className="kids-doodle-dot" />
         </svg>
       );
     default:
       return (
         <svg {...common}>
-          <rect x="18" y="20" width="28" height="29" rx="7" className="kids-doodle-fill" />
-          <path d="M32 20v-8M27 12h10" />
-          <circle cx="26" cy="33" r="2.7" className="kids-doodle-dot" />
-          <circle cx="38" cy="33" r="2.7" className="kids-doodle-dot" />
-          <path d="M27 43h10M24 26h16M23 49v4M41 49v4" />
-          <path d="M12 31h6M46 31h6M13 40h5M46 40h5" className="kids-doodle-detail" />
+          <path d="M32 9 L37 24 L53 24 L41 34 L45 50 L32 41 L19 50 L23 34 L11 24 L27 24 Z" className="kids-doodle-fill" />
+          <path d="M32 9 L37 24 L53 24 L41 34 L45 50 L32 41 L19 50 L23 34 L11 24 L27 24 Z" />
         </svg>
       );
   }
@@ -276,36 +308,56 @@ export default async function KidsSitePage() {
     ...friendlyGames,
   ]);
 
-  const allKidsGames = uniqueById([
-    ...easyGames,
-    ...puzzleGames,
-    ...creativeGames,
+  const learningGames = uniqueById([
+    ...byWords(friendlyGames, ['learn', 'learning', 'letter', 'word', 'math', 'school', 'kindergarten', 'quiz', 'brain', 'find']),
+    ...bySlugs(friendlyGames, ['puzzle', 'skill']),
     ...friendlyGames,
-  ]).slice(0, 40);
+  ]);
+
+  const cuteGames = uniqueById([
+    ...byWords(friendlyGames, ['baby', 'hazel', 'cute', 'pet', 'cat', 'pony', 'chick', 'dolphin', 'princess', 'santa']),
+    ...bySlugs(friendlyGames, ['kids', 'girls', 'beauty']),
+    ...friendlyGames,
+  ]);
+
+  const dressUpGames = uniqueById([
+    ...byWords(friendlyGames, ['dress', 'fashion', 'makeup', 'hair', 'salon', 'princess', 'style']),
+    ...bySlugs(friendlyGames, ['girls', 'beauty']),
+    ...creativeGames,
+  ]);
+
+  const kidsFilters: KidsFilter[] = [
+    { id: 'learning', label: 'Learning', games: learningGames.slice(0, 24) },
+    { id: 'cute', label: 'Cute', games: cuteGames.slice(0, 24) },
+    { id: 'puzzle', label: 'Puzzle', games: puzzleGames.slice(0, 24) },
+    { id: 'dress-up', label: 'Dress Up', games: dressUpGames.slice(0, 24) },
+    { id: 'easy', label: 'Easy', games: easyGames.slice(0, 24) },
+  ];
+
 
   return (
     <div className="kids-site-page">
       <section className="kids-cloud-hero">
-        <Link href="/" className="kids-logo" aria-label="GameZone home">
+        <div className="kids-logo kids-logo-display" aria-label="GameZone Kids Playroom">
           <span className="kids-logo-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 6H6a4 4 0 0 0-4 4v3a4 4 0 0 0 4 4h1.5a3 3 0 0 1 2.5 1.5L11 20a1 1 0 0 0 2 0l1-1.5a3 3 0 0 1 2.5-1.5H18a4 4 0 0 0 4-4v-3a4 4 0 0 0-4-4z" />
               <path d="M6 12h4M8 10v4" />
-              <circle cx="15.5" cy="11.5" r="1" fill="currentColor" stroke="none" />
-              <circle cx="18" cy="13.5" r="1" fill="currentColor" stroke="none" />
+              <circle cx="15" cy="11.5" r="1" fill="currentColor" stroke="none" />
+              <circle cx="17.5" cy="13.5" r="1" fill="currentColor" stroke="none" />
             </svg>
           </span>
           <span>
             <span className="kids-logo-small">GameZone</span>
             <span className="kids-logo-word">Kids Playroom</span>
           </span>
-        </Link>
+        </div>
       </section>
 
       <main className="kids-site-main">
         <section className="kids-play-band">
           <div className="kids-doodle-row">
-            {DOODLES.slice(0, 4).map((item) => (
+            {DOODLES.slice(0, 3).map((item) => (
               <DoodleIcon key={item.kind} {...item} />
             ))}
           </div>
@@ -315,17 +367,13 @@ export default async function KidsSitePage() {
           </h1>
 
           <div className="kids-doodle-row">
-            {DOODLES.slice(4).map((item) => (
+            {DOODLES.slice(3).map((item) => (
               <DoodleIcon key={item.kind} {...item} />
             ))}
           </div>
         </section>
 
-        <section id="kids-games" className="kids-game-grid kids-game-grid-main">
-          {allKidsGames.slice(0, 20).map((game, index) => (
-            <KidsGameTile key={game.id} game={game} priority={index < 8} />
-          ))}
-        </section>
+        <KidsFilterTabs filters={kidsFilters} />
 
         <KidsGameStrip title="Easy picks" games={easyGames.slice(20, 30)} />
         <KidsGameStrip title="Puzzle time" games={puzzleGames.slice(8, 18)} />
@@ -347,6 +395,7 @@ export default async function KidsSitePage() {
           </div>
         </section>
       </main>
+      <KidsAnimations />
     </div>
   );
 }

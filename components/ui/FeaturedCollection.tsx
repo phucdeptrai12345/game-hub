@@ -3,9 +3,11 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import GameCard from '@/components/ui/GameCard';
 import type { Game } from '@/lib/types';
+import { useI18n } from '@/components/providers/I18nProvider';
 
 interface Props {
   title?: string;
+  titleKey?: string;
   games: Game[];
   autoPlay?: boolean;
 }
@@ -19,7 +21,9 @@ function ArrowIcon({ direction }: { direction: 'prev' | 'next' }) {
   );
 }
 
-export default function FeaturedCollection({ title = 'Featured Collection', games, autoPlay = true }: Props) {
+export default function FeaturedCollection({ title, titleKey = 'section.featured', games, autoPlay = true }: Props) {
+  const { t } = useI18n();
+  const displayTitle = title ?? t(titleKey);
   const pages = useMemo(() => {
     const chunks: Game[][] = [];
     for (let i = 0; i < games.length; i += 6) chunks.push(games.slice(i, i + 6));
@@ -45,16 +49,21 @@ export default function FeaturedCollection({ title = 'Featured Collection', game
 
   return (
     <section
-      aria-labelledby={`shelf-${title.toLowerCase().replace(/\W+/g, '-')}`}
+      aria-labelledby={`shelf-${displayTitle.toLowerCase().replace(/\W+/g, '-')}`}
       className="min-w-0"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="mb-2 flex items-center justify-between gap-4">
-        <h2 id={`shelf-${title.toLowerCase().replace(/\W+/g, '-')}`}
-          className="text-sm font-black uppercase tracking-wide text-fg">
-          {title}
-        </h2>
+      <div className="mb-3 flex items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="h-5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+          <h2
+            id={`shelf-${displayTitle.toLowerCase().replace(/\W+/g, '-')}`}
+            className="truncate text-lg font-black uppercase tracking-tight text-fg title-display"
+          >
+            {displayTitle}
+          </h2>
+        </div>
 
         {canCycle && (
           <div className="flex items-center gap-2">
@@ -74,12 +83,12 @@ export default function FeaturedCollection({ title = 'Featured Collection', game
               ))}
             </div>
             <button onClick={goPrev}
-              className="active-click flex h-6 w-6 items-center justify-center rounded-full border border-border/70 bg-surface/95 text-muted shadow-sm transition-colors hover:text-accent"
+              className="active-click flex h-7 w-7 items-center justify-center rounded-full border border-border/70 bg-surface/95 text-muted shadow-sm transition-colors hover:text-accent"
               aria-label="Previous">
               <ArrowIcon direction="prev" />
             </button>
             <button onClick={goNext}
-              className="active-click flex h-6 w-6 items-center justify-center rounded-full border border-border/70 bg-surface/95 text-muted shadow-sm transition-colors hover:text-accent"
+              className="active-click flex h-7 w-7 items-center justify-center rounded-full border border-border/70 bg-surface/95 text-muted shadow-sm transition-colors hover:text-accent"
               aria-label="Next">
               <ArrowIcon direction="next" />
             </button>
@@ -87,7 +96,7 @@ export default function FeaturedCollection({ title = 'Featured Collection', game
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
         {currentGames.map((game, index) => (
           <div key={`${page}-${game.id}`} className="featured-card-page aspect-square min-h-[78px]">
             <GameCard game={game} priority={page === 0 && index < 6} variant="default" compact />
