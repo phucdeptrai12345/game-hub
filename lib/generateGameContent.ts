@@ -3,7 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import type { Game } from './types';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+function getGroq() {
+  return new Groq({ apiKey: process.env.GROQ_API_KEY });
+}
 
 const CACHE_DIR = path.join(process.cwd(), 'data', 'game-content');
 
@@ -86,7 +88,7 @@ Respond ONLY with valid JSON in this exact format:
 }`;
 
   try {
-    const completion = await groq.chat.completions.create({
+    const completion = await getGroq().chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.75,
