@@ -59,7 +59,7 @@ export default function FeaturedCollection({ title, titleKey = 'section.featured
           <span className="h-5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
           <h2
             id={`shelf-${displayTitle.toLowerCase().replace(/\W+/g, '-')}`}
-            className="truncate text-lg font-black uppercase tracking-tight text-fg title-display"
+            className="truncate text-xl font-black uppercase tracking-tight text-fg title-display"
           >
             {displayTitle}
           </h2>
@@ -99,7 +99,7 @@ export default function FeaturedCollection({ title, titleKey = 'section.featured
       <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
         {currentGames.map((game, index) => (
           <div key={`${page}-${game.id}`} className="featured-card-page aspect-square min-h-[78px]">
-            <GameCard game={game} priority={page === 0 && index < 6} variant="default" compact />
+            <GameCard game={game} priority={index < 6} variant="default" compact />
           </div>
         ))}
       </div>

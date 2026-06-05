@@ -20,40 +20,43 @@ const QUICK_RULES = [
 
 function Section({ title, eyebrow, children }: { title: string; eyebrow: string; children: ReactNode }) {
   return (
-    <section className="border-t border-border/60 py-8">
-      <p className="mb-2 text-[11px] font-black uppercase tracking-[0.13em] text-accent/80">{eyebrow}</p>
-      <h2 className="mb-4 text-xl font-black leading-tight text-fg">{title}</h2>
-      <div className="space-y-3 text-[0.96rem] font-semibold leading-[1.85] text-muted">{children}</div>
+    <section className="border-t border-border/60 py-10 grid grid-cols-[48px_1fr] gap-6 sm:grid-cols-[64px_1fr] sm:gap-8">
+      <div className="pt-1">
+        <span className="text-4xl font-black text-accent/20 title-display leading-none">{eyebrow}</span>
+      </div>
+      <div>
+        <h2 className="text-xl font-black text-fg title-display uppercase tracking-tight mb-4">{title}</h2>
+        <div className="space-y-3 text-[0.96rem] font-semibold leading-[1.85] text-muted">{children}</div>
+      </div>
     </section>
   );
 }
 
 export default function TermsPage() {
   return (
-    <div className="w-full px-4 py-10 sm:px-6 lg:px-8 xl:px-12">
-      <div className="mx-auto max-w-4xl">
+    <div className="w-full px-3 sm:px-4 lg:px-5 xl:px-6 py-10">
+      <div className="mx-auto max-w-[1500px]">
 
         {/* Page header */}
-        <header className="mb-8">
-          <p className="mb-3 text-xs font-black uppercase tracking-[0.14em] text-accent">
-            GameZone · Terms of Use
-          </p>
-          <h1 className="text-3xl font-black leading-tight text-fg title-display sm:text-4xl">
-            Terms of Use
-          </h1>
-          <p className="mt-2 text-sm font-semibold text-muted/60">Last updated: {LAST_UPDATED}</p>
+        <header className="mb-10">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="h-5 w-1 rounded-full bg-accent" aria-hidden="true" />
+            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-accent">Legal</p>
+          </div>
+          <h1 className="text-4xl font-black text-fg title-display uppercase tracking-tight sm:text-5xl leading-[0.95]">Terms of Use</h1>
+          <p className="text-muted text-sm font-semibold mt-3">Last updated: {LAST_UPDATED}</p>
         </header>
 
         {/* Summary box */}
-        <div className="mb-8 rounded-2xl border border-border bg-navy px-5 py-4">
-          <p className="mb-3 text-sm font-semibold leading-7 text-muted">
+        <div className="mb-10 border-l-4 border-accent bg-navy px-6 py-5">
+          <p className="mb-4 text-sm font-semibold leading-7 text-muted">
             GameZone is made for quick browser play. These terms explain what is allowed,
             what is not allowed, and how third-party games, ads, and links fit into the site.
           </p>
-          <ul className="space-y-1.5">
+          <ul className="space-y-2">
             {QUICK_RULES.map((rule) => (
-              <li key={rule} className="flex gap-2 text-sm font-bold text-fg">
-                <span className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true">→</span>
+              <li key={rule} className="flex gap-3 text-sm font-bold text-fg">
+                <span className="mt-0.5 shrink-0 text-accent" aria-hidden="true">{'->'}</span>
                 {rule}
               </li>
             ))}
@@ -61,7 +64,7 @@ export default function TermsPage() {
         </div>
 
         {/* Document body */}
-        <div className="lg:grid lg:grid-cols-[1fr_200px] lg:gap-14 lg:items-start">
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:gap-12 xl:gap-16 lg:items-start">
           <article>
             <Section eyebrow="01" title="Using GameZone means accepting these terms">
               <p>
@@ -172,7 +175,7 @@ export default function TermsPage() {
 
           {/* Sticky sidebar — desktop only */}
           <aside className="hidden lg:block sticky top-24 space-y-1">
-            <p className="mb-3 text-xs font-black uppercase tracking-widest text-muted/50">
+            <p className="mb-3 text-[11px] font-black uppercase tracking-[0.18em] text-muted/50">
               Related
             </p>
             {[
@@ -183,9 +186,12 @@ export default function TermsPage() {
               <Link
                 key={href}
                 href={href}
-                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-muted transition-colors duration-150 hover:bg-navy hover:text-fg"
+                className="group flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-muted transition-colors duration-150 hover:bg-navy hover:text-fg"
               >
                 {label}
+                <svg className="w-3 h-3 shrink-0 text-muted/40 group-hover:text-accent group-hover:translate-x-0.5 transition-all" fill="none" viewBox="0 0 16 16" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 8h10M9 4l4 4-4 4" />
+                </svg>
               </Link>
             ))}
             <p className="mt-4 px-3 text-xs font-semibold leading-5 text-muted/50">

@@ -7,6 +7,7 @@ import GameImage from '@/components/ui/GameImage';
 import SearchCategoryScroller from '@/components/ui/SearchCategoryScroller';
 import type { Game } from '@/lib/types';
 import { useI18n } from '@/components/providers/I18nProvider';
+import { CATEGORIES } from '@/constants/categories';
 
 interface Props {
   isOpen: boolean;
@@ -132,6 +133,12 @@ export default function SearchOverlay({ isOpen, onClose }: Props) {
   if (!isOpen) return null;
 
   const showResults = query.trim().length > 0;
+  const matchedCategories = query.trim()
+    ? CATEGORIES.filter((c) =>
+        c.name.toLowerCase().includes(query.trim().toLowerCase()) ||
+        c.slug.toLowerCase().includes(query.trim().toLowerCase())
+      ).slice(0, 8)
+    : [];
 
   return (
     <>
@@ -189,26 +196,49 @@ export default function SearchOverlay({ isOpen, onClose }: Props) {
 
           {showResults ? (
             /* ── Search results ── */
-            <section>
-              <h2 className="text-xs font-bold uppercase tracking-widest text-muted mb-4">
-                {searching ? '...' : `${searchResults.length} ${t('search.results')}`}
-              </h2>
-              {searching ? (
-                <SkeletonGrid />
-              ) : searchResults.length > 0 ? (
-                <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
-                  {searchResults.map((g) => (
-                    <MiniCard key={g.id} game={g} onClose={onClose} />
-                  ))}
-                </div>
-              ) : (
-                <div className="py-16 text-center">
-                  <p className="text-4xl mb-3">🔍</p>
-                  <p className="font-bold text-fg">{t('search.noResults')}</p>
-                  <p className="text-muted text-sm mt-1 font-semibold">{t('search.tryDifferent')}</p>
-                </div>
+            <div className="space-y-6">
+              {/* Category matches */}
+              {matchedCategories.length > 0 && (
+                <section>
+                  <h2 className="text-xs font-bold uppercase tracking-widest text-muted mb-3">
+                    {t('search.categories')}
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {matchedCategories.map((cat) => (
+                      <Link
+                        key={cat.slug}
+                        href={`/category/${cat.slug}`}
+                        onClick={onClose}
+                        className="rounded-full border border-border bg-navy px-3.5 py-2 text-sm font-bold text-fg transition-colors duration-150 hover:border-accent/40 hover:text-accent"
+                      >
+                        {cat.name}
+                      </Link>
+                    ))}
+                  </div>
+                </section>
               )}
-            </section>
+              {/* Game results */}
+              <section>
+                <h2 className="text-xs font-bold uppercase tracking-widest text-muted mb-4">
+                  {searching ? '...' : `${searchResults.length} ${t('search.results')}`}
+                </h2>
+                {searching ? (
+                  <SkeletonGrid />
+                ) : searchResults.length > 0 ? (
+                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
+                    {searchResults.map((g) => (
+                      <MiniCard key={g.id} game={g} onClose={onClose} />
+                    ))}
+                  </div>
+                ) : matchedCategories.length === 0 ? (
+                  <div className="py-16 text-center">
+                    <p className="text-4xl mb-3">🔍</p>
+                    <p className="font-bold text-fg">{t('search.noResults')}</p>
+                    <p className="text-muted text-sm mt-1 font-semibold">{t('search.tryDifferent')}</p>
+                  </div>
+                ) : null}
+              </section>
+            </div>
 
           ) : (
             /* ── Default: categories + popular + new ── */

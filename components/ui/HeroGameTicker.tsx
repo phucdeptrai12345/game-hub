@@ -29,6 +29,7 @@ export default function HeroGameTicker({ games }: Props) {
               className="object-cover transition-transform duration-300 group-hover:scale-110"
               fallbackClassName="absolute inset-0 flex items-center justify-center bg-navy text-[10px] font-black text-muted"
               sizes="72px"
+              priority={index < strip.length}
             />
           </Link>
         ))}

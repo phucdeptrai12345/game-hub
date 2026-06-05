@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from 'next';
-import { Nunito, Russo_One, Exo_2 } from 'next/font/google';
+import { Plus_Jakarta_Sans, Fredoka } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
 import Footer from '@/components/layout/Footer';
+import PatternMain from '@/components/layout/PatternMain';
 import TopLoadingBar from '@/components/ui/TopLoadingBar';
 import BackToTopButton from '@/components/ui/BackToTopButton';
 import ConsentManager from '@/components/ui/ConsentManager';
@@ -12,26 +13,20 @@ import { SidebarProvider } from '@/components/providers/SidebarProvider';
 import { I18nProvider } from '@/components/providers/I18nProvider';
 import { SITE_URL } from '@/lib/site';
 
-const nunito = Nunito({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin', 'vietnamese'],
-  weight: ['400', '600', '700', '800', '900'],
+  weight: ['300', '400', '500', '600', '700', '800'],
   variable: '--font-nunito',
   display: 'swap',
 });
 
-const russoOne = Russo_One({
+const fredoka = Fredoka({
   subsets: ['latin'],
-  weight: '400',
+  weight: ['400', '500', '600', '700'],
   variable: '--font-russo-one',
   display: 'swap',
 });
 
-const exo2 = Exo_2({
-  subsets: ['latin'],
-  weight: ['700', '800', '900'],
-  variable: '--font-exo2',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -63,7 +58,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-theme="dark" data-scroll-behavior="smooth" className={`${nunito.variable} ${russoOne.variable} ${exo2.variable} h-full bg-background`}>
+    <html lang="en" data-theme="dark" data-scroll-behavior="smooth" className={`${plusJakartaSans.variable} ${fredoka.variable} h-full bg-background`}>
       <body className="min-h-full flex flex-col text-fg antialiased">
         <a
           href="#main-content"
@@ -78,10 +73,10 @@ export default function RootLayout({
           <Navbar />
           <div className="flex flex-1">
             <Sidebar />
-            <main id="main-content" className="w-full min-w-0 flex-1 overflow-x-clip">
+            <PatternMain>
               {children}
               <Footer />
-            </main>
+            </PatternMain>
           </div>
           <BackToTopButton />
           <ConsentManager />

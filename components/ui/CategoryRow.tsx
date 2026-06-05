@@ -58,15 +58,14 @@ export default function CategoryRow({
     const scroller = scrollerRef.current;
     if (!scroller) return;
 
+    // ResizeObserver handles resize — no need for window resize listener
     const resizeObserver = new ResizeObserver(syncScrollState);
     resizeObserver.observe(scroller);
     scroller.addEventListener('scroll', syncScrollState, { passive: true });
-    window.addEventListener('resize', syncScrollState);
 
     return () => {
       resizeObserver.disconnect();
       scroller.removeEventListener('scroll', syncScrollState);
-      window.removeEventListener('resize', syncScrollState);
     };
   }, [syncScrollState, games.length]);
 
@@ -156,7 +155,7 @@ export default function CategoryRow({
         <div className="flex min-w-0 items-center gap-2.5">
           <span className="h-6 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
           <span className="shrink-0 text-xl" aria-hidden="true">{icon}</span>
-          <h2 className="truncate text-lg font-black uppercase tracking-tight text-fg title-display">
+          <h2 className="truncate text-2xl font-black uppercase tracking-tight text-fg title-display">
             {title}
           </h2>
         </div>
@@ -173,6 +172,8 @@ export default function CategoryRow({
         className="category-row-shell"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onFocus={() => setIsHovered(true)}
+        onBlur={() => setIsHovered(false)}
       >
         <div
           ref={scrollerRef}

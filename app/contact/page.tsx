@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { CONTACT_EMAIL } from '@/lib/site';
 
@@ -9,185 +8,231 @@ export const metadata: Metadata = {
     'Contact GameZone for broken games, catalog feedback, rights requests, partnerships, or general questions.',
 };
 
-const TOPICS = [
+const REQUESTS = [
   {
     label: 'Broken game',
-    title: 'A game will not load',
-    text: 'Send the game name, page URL, browser, device, and what you see on screen.',
+    title: 'A game does not load',
+    text: 'Send the game link, browser, device, and what happened on screen.',
+    subject: 'Broken game report',
   },
   {
-    label: 'Catalog',
-    title: 'Suggest or fix a game',
-    text: 'Found a better source, wrong category, missing image, or a game we should add? Point us to it.',
+    label: 'Catalog fix',
+    title: 'Wrong image, category, or source',
+    text: 'Tell us what looks off and the page where you found it.',
+    subject: 'Catalog correction',
   },
   {
     label: 'Safety',
-    title: 'Report content',
-    text: 'Tell us if a game looks inappropriate, harmful, misleading, or not suitable for its category.',
+    title: 'Report unsuitable content',
+    text: 'Flag games that feel misleading, harmful, or placed in the wrong area.',
+    subject: 'Content report',
   },
   {
     label: 'Rights',
     title: 'Removal or ownership request',
-    text: 'Developers and rights holders can send the game URL, claim details, and preferred next step.',
+    text: 'Include the game URL, rights details, and the action you want us to take.',
+    subject: 'Rights or removal request',
   },
   {
     label: 'Business',
-    title: 'Ads and partnerships',
-    text: 'For ad placements, distribution, or partnership ideas, include your website and proposal.',
+    title: 'Ads, distribution, partnerships',
+    text: 'Share your site, company, proposal, and the best contact person.',
+    subject: 'Partnership request',
   },
   {
-    label: 'Product',
-    title: 'Feedback for the site',
-    text: 'Navigation, search, categories, kids site, game player, or UI ideas are welcome.',
+    label: 'Feedback',
+    title: 'Improve GameZone',
+    text: 'Search, categories, kids site, game player, UI feedback, or game suggestions.',
+    subject: 'GameZone feedback',
   },
 ];
 
-const MESSAGE_TIPS = [
-  'Game title or page link',
-  'Browser and device',
-  'Screenshot or short screen recording if useful',
-  'What you expected to happen',
-  'What happened instead',
+const CHECKLIST = [
+  'Game title or page URL',
+  'Device and browser',
+  'Short description of the issue',
+  'Screenshot or short clip if useful',
 ];
+
+function mailto(subject: string) {
+  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`;
+}
 
 function MailIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" />
       <path d="m22 8-10 6L2 8" />
     </svg>
   );
 }
 
-function TopicCard({ label, title, text }: { label: string; title: string; text: string }) {
+function RequestCard({
+  label,
+  title,
+  text,
+  subject,
+}: {
+  label: string;
+  title: string;
+  text: string;
+  subject: string;
+}) {
   return (
-    <article className="rounded-2xl border border-border bg-surface p-5 shadow-[0_4px_16px_oklch(18%_0.02_250/0.06)] transition-all duration-200 ease-out hover:-translate-y-1 hover:border-accent/35 hover:shadow-[0_8px_24px_oklch(18%_0.02_250/0.10)]">
-      <p className="mb-3 text-xs font-black uppercase tracking-wide text-accent">{label}</p>
-      <h2 className="text-xl font-black leading-tight text-fg">{title}</h2>
-      <p className="mt-2.5 text-sm font-semibold leading-6 text-muted">{text}</p>
-    </article>
-  );
-}
-
-function SideBlock({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="rounded-xl border border-border bg-surface p-5">
-      <h2 className="text-base font-black text-fg">{title}</h2>
-      <div className="mt-3 text-sm font-semibold leading-7 text-muted">{children}</div>
-    </div>
+    <a
+      href={mailto(subject)}
+      className="group block rounded-xl border border-border bg-surface p-4 transition-all duration-150 hover:-translate-y-0.5 hover:border-accent/45 hover:shadow-[0_10px_26px_oklch(22%_0.04_35/0.10)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+    >
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <span className="rounded-full bg-accent-light px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-accent">
+          {label}
+        </span>
+        <span className="text-sm font-black text-accent opacity-60 transition-opacity group-hover:opacity-100">
+          {'->'}
+        </span>
+      </div>
+      <h2 className="text-lg font-black leading-tight text-fg">{title}</h2>
+      <p className="mt-2 text-sm font-semibold leading-6 text-muted">{text}</p>
+    </a>
   );
 }
 
 export default function ContactPage() {
-  const mailSubject = 'GameZone contact';
-
   return (
-    <div className="home-pattern min-h-screen w-full px-4 py-10 sm:px-6 lg:px-8 xl:px-12">
-      <section className="relative overflow-hidden rounded-3xl border border-border bg-surface px-6 py-10 shadow-[0_8px_32px_oklch(18%_0.02_250/0.08)] sm:px-8 lg:px-10">
-        <div
-          className="absolute right-[-8%] top-[-20%] h-[145%] w-[38%] rotate-[-12deg] bg-accent/12"
-          aria-hidden="true"
-          style={{ clipPath: 'polygon(18% 0, 100% 0, 82% 100%, 0 82%)' }}
-        />
-        <div className="relative z-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_390px] lg:items-end">
+    <div className="w-full px-3 py-10 sm:px-4 lg:px-5 xl:px-6">
+      <div className="mx-auto max-w-[1500px]">
+        <header className="grid gap-8 border-b border-border/70 pb-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-end">
           <div>
-            <p className="mb-3 inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-accent">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
-              Contact GameZone
-            </p>
-            <h1 className="max-w-5xl text-5xl font-black uppercase leading-none text-fg title-display sm:text-6xl lg:text-7xl">
-              Tell us what needs attention.
+            <div className="mb-4 flex items-center gap-2">
+              <span className="h-5 w-1 rounded-full bg-accent" aria-hidden="true" />
+              <p className="text-[11px] font-black uppercase tracking-[0.18em] text-accent">
+                Contact
+              </p>
+            </div>
+            <h1 className="title-display max-w-4xl text-4xl font-black uppercase leading-[0.98] tracking-tight text-fg sm:text-5xl lg:text-6xl">
+              Need help with GameZone?
             </h1>
-            <p className="mt-5 max-w-4xl text-lg font-bold leading-8 text-muted">
-              Broken game, catalog issue, rights request, partnership idea, or general feedback:
-              send the details and we will route it to the right place.
+            <p className="mt-4 max-w-3xl text-base font-semibold leading-8 text-muted sm:text-lg">
+              Send broken games, rights requests, catalog fixes, partnership notes, or site feedback.
+              Clear details help us find the right page and fix the right thing.
             </p>
           </div>
 
-          <aside className="rounded-2xl border border-border bg-background/78 p-5 backdrop-blur">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-white shadow-[0_12px_24px_oklch(63%_0.26_28/0.22)]">
-              <MailIcon />
-            </div>
-            <p className="mt-5 text-xs font-black uppercase tracking-wide text-accent">Email</p>
-            <a
-              href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(mailSubject)}`}
-              className="mt-1 block break-all text-xl font-black text-fg title-display transition-colors hover:text-accent"
-            >
-              {CONTACT_EMAIL}
-            </a>
-            <p className="mt-4 text-sm font-bold leading-7 text-muted">
-              Most messages get a reply within 1–2 business days. Rights and legal requests may take longer.
-            </p>
-          </aside>
-        </div>
-      </section>
-
-      <main className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div>
-          <div className="mb-5 flex items-end justify-between gap-4">
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.14em] text-accent">What to send</p>
-              <h2 className="mt-2 text-3xl font-black uppercase leading-tight text-fg title-display sm:text-4xl">
-                Choose the closest topic.
-              </h2>
-            </div>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {TOPICS.map((topic) => (
-              <TopicCard key={topic.title} {...topic} />
-            ))}
-          </div>
-
-          <section className="mt-5 rounded-2xl border border-border bg-[oklch(15%_0.035_276)] p-6 text-white shadow-[0_8px_28px_oklch(8%_0.02_276/0.16)]">
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-              <div>
-                <p className="mb-2 text-sm font-black uppercase tracking-[0.14em] text-accent">Ready to send?</p>
-                <h2 className="max-w-3xl text-4xl font-black uppercase leading-tight title-display">
-                  A clear message gets fixed faster.
-                </h2>
-                <p className="mt-4 max-w-3xl text-sm font-bold leading-7 text-white/74">
-                  Include the game page, what happened, and the device or browser you used. If it is a rights request,
-                  include the ownership details and the action you are asking for.
+          <aside className="rounded-2xl border border-border bg-surface p-5 shadow-[0_10px_28px_oklch(22%_0.04_35/0.08)]">
+            <div className="flex items-start gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent text-white">
+                <MailIcon />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-muted">
+                  Main inbox
                 </p>
+                <a
+                  href={mailto('GameZone contact')}
+                  className="mt-1 block break-all text-xl font-black text-fg transition-colors hover:text-accent"
+                >
+                  {CONTACT_EMAIL}
+                </a>
+              </div>
+            </div>
+
+            <div className="mt-5 grid grid-cols-2 gap-3 border-t border-border pt-4">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.14em] text-accent">Reply</p>
+                <p className="mt-1 text-sm font-bold text-muted">Usually 1-2 business days</p>
+              </div>
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.14em] text-accent">Best for</p>
+                <p className="mt-1 text-sm font-bold text-muted">Support, rights, partners</p>
+              </div>
+            </div>
+          </aside>
+        </header>
+
+        <main className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_330px]">
+          <section>
+            <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-accent">
+                  Start here
+                </p>
+                <h2 className="title-display mt-2 text-3xl font-black uppercase leading-tight text-fg sm:text-4xl">
+                  Pick the closest reason.
+                </h2>
               </div>
               <a
-                href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(mailSubject)}`}
-                className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-6 text-sm font-bold text-white transition-colors hover:bg-accent-hover"
+                href={mailto('GameZone contact')}
+                className="link-red-action text-sm font-bold"
               >
-                Send email
+                Email directly {'->'}
               </a>
             </div>
-          </section>
-        </div>
 
-        <aside className="grid h-fit gap-5 lg:sticky lg:top-24">
-          <SideBlock title="Helpful details">
-            <ul className="space-y-2.5">
-              {MESSAGE_TIPS.map((tip) => (
-                <li key={tip} className="flex gap-2">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
-                  <span>{tip}</span>
-                </li>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {REQUESTS.map((item) => (
+                <RequestCard key={item.subject} {...item} />
               ))}
-            </ul>
-          </SideBlock>
-
-          <SideBlock title="Related pages">
-            <div className="grid gap-2">
-              <Link href="/about" className="rounded-xl border border-border bg-background px-4 py-3 font-bold text-fg transition-colors hover:border-accent/40 hover:text-accent">
-                About GameZone
-              </Link>
-              <Link href="/privacy" className="rounded-xl border border-border bg-background px-4 py-3 font-bold text-fg transition-colors hover:border-accent/40 hover:text-accent">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="rounded-xl border border-border bg-background px-4 py-3 font-bold text-fg transition-colors hover:border-accent/40 hover:text-accent">
-                Terms of Use
-              </Link>
             </div>
-          </SideBlock>
-        </aside>
-      </main>
+          </section>
+
+          <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+            <section className="rounded-2xl border border-border bg-surface p-5">
+              <h2 className="text-lg font-black text-fg">What helps us reply</h2>
+              <ol className="mt-4 space-y-3">
+                {CHECKLIST.map((item, index) => (
+                  <li key={item} className="flex gap-3 text-sm font-bold leading-6 text-muted">
+                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-light text-[11px] font-black text-accent">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+
+            <section className="rounded-2xl border border-border bg-surface p-5">
+              <h2 className="text-lg font-black text-fg">Useful pages</h2>
+              <div className="mt-4 grid gap-2">
+                {[
+                  { href: '/about', label: 'About GameZone' },
+                  { href: '/privacy', label: 'Privacy Policy' },
+                  { href: '/terms', label: 'Terms of Use' },
+                  { href: '/kids-site', label: 'For Kids' },
+                ].map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center justify-between rounded-xl border border-border bg-background/70 px-4 py-3 text-sm font-bold text-fg transition-colors hover:border-accent/45 hover:text-accent"
+                  >
+                    {link.label}
+                    <span aria-hidden="true">{'->'}</span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          </aside>
+        </main>
+
+        <section className="mt-8 rounded-2xl border border-border bg-surface/80 p-5 sm:p-6">
+          <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.18em] text-accent">
+                Rights holders
+              </p>
+              <p className="mt-2 max-w-4xl text-sm font-semibold leading-7 text-muted">
+                If you own a game or asset listed on GameZone, include proof of ownership, the exact page URL,
+                and whether you want attribution corrected, source updated, or content removed.
+              </p>
+            </div>
+            <a
+              href={mailto('Rights or removal request')}
+              className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-6 text-sm font-black text-white transition-colors hover:bg-accent-hover"
+            >
+              Send rights request
+            </a>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

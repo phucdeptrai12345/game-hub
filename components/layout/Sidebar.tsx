@@ -72,6 +72,12 @@ const HeartIcon = () => (
     <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
   </svg>
 );
+const BlogIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z"/>
+    <path d="M8 9h8M8 13h5"/>
+  </svg>
+);
 
 const NAV_ITEMS = [
   { labelKey: 'nav.home',        href: '/',                     Icon: HomeIcon },
@@ -81,6 +87,7 @@ const NAV_ITEMS = [
   { labelKey: 'nav.multiplayer', href: '/category/multiplayer', Icon: MultiIcon },
   { labelKey: 'nav.twoPlayer',   href: '/category/2player',     Icon: TwoPlayerIcon },
   { labelKey: 'nav.favorites',   href: '/favorites',            Icon: HeartIcon },
+  { labelKey: 'nav.blog',        href: '/blog',                 Icon: BlogIcon  },
   { labelKey: 'nav.about',       href: '/about',                Icon: AboutIcon },
 ];
 

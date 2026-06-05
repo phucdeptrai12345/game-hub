@@ -25,9 +25,7 @@ function gamePixFallbacks(src: string): string[] {
   const medium = src.replace(/\/thumbnail\/(?:small|medium|big)\.png(?:\?.*)?$/i, '/thumbnail/medium.png');
   const small = src.replace(/\/thumbnail\/(?:small|medium|big)\.png(?:\?.*)?$/i, '/thumbnail/small.png');
 
-  if (src.includes('/thumbnail/big.png')) return unique([src, medium, small]);
-  if (src.includes('/thumbnail/medium.png')) return unique([src, small, big]);
-  return unique([src, medium, big]);
+  return unique([big, src, medium, small]);
 }
 
 function candidatesFor(game: GameImageGame): string[] {
@@ -68,19 +66,30 @@ export default function GameImage({
   onLoad,
   ...props
 }: Props) {
-  const candidates = useMemo(() => candidatesFor(game), [game]);
+  const candidates = useMemo(() => candidatesFor(game), [game.provider, game.thumb]);
   const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  const [showFallback, setShowFallback] = useState(false);
 
   useEffect(() => {
     setIndex(0);
     setLoaded(false);
+    setShowFallback(false);
   }, [candidates]);
 
   const src = candidates[index];
 
   useEffect(() => {
     setLoaded(false);
+    setShowFallback(false);
+
+    if (!src) return;
+
+    const timer = window.setTimeout(() => {
+      setShowFallback(true);
+    }, 650);
+
+    return () => window.clearTimeout(timer);
   }, [src]);
 
   if (!src) {
@@ -89,7 +98,7 @@ export default function GameImage({
 
   return (
     <>
-      {!loaded && <ImageFallback title={game.title} className={fallbackClassName} />}
+      {!loaded && showFallback && <ImageFallback title={game.title} className={fallbackClassName} />}
       <Image
         {...props}
         src={src}
@@ -98,10 +107,12 @@ export default function GameImage({
         unoptimized
         onLoad={(event) => {
           setLoaded(true);
+          setShowFallback(false);
           onLoad?.(event);
         }}
         onError={() => {
           setLoaded(false);
+          setShowFallback(true);
           setIndex((current) => {
             const next = current + 1;
             return next < candidates.length ? next : candidates.length;

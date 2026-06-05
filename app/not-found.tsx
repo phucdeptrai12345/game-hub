@@ -10,12 +10,12 @@ export default function NotFound() {
     <div className="mx-auto flex min-h-[60vh] max-w-7xl flex-col items-center justify-center px-4 py-32 text-center sm:px-6 lg:px-8">
       <p
         className="select-none text-[9rem] font-black leading-none md:text-[12rem]"
-        style={{ color: 'oklch(94% 0.005 255 / 0.07)' }}
+        style={{ color: 'oklch(94% 0.005 255 / 0.13)' }}
         aria-hidden="true"
       >
         404
       </p>
-      <h1 className="-mt-4 mb-3 text-3xl font-black text-fg">{t('notFound.title')}</h1>
+      <h1 className="-mt-4 mb-3 text-3xl font-black text-fg title-display">{t('notFound.title')}</h1>
       <p className="mb-10 max-w-xs font-semibold leading-relaxed text-muted">
         {t('notFound.description')}
       </p>

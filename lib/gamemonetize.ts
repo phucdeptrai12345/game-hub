@@ -46,8 +46,22 @@ function isDirectPlayable(game: Game): boolean {
   return game.provider !== 'famobi' || ENABLE_FAMOBI_INLINE;
 }
 
+// Module-level caches — computed once per server instance
+let _activeCache: Game[] | null = null;
+let _newestCache: Game[] | null = null;
+
 function activeGames(): Game[] {
-  return games.filter((game) => isDirectPlayable(game) && !isBlocked(game));
+  if (!_activeCache) {
+    _activeCache = games.filter((game) => isDirectPlayable(game) && !isBlocked(game));
+  }
+  return _activeCache;
+}
+
+function sortedByNewest(): Game[] {
+  if (!_newestCache) {
+    _newestCache = [...activeGames()].sort(byNewest);
+  }
+  return _newestCache;
 }
 
 function byQuality(a: Game, b: Game): number {
@@ -91,18 +105,19 @@ export async function getMostPlayedGames(count = 200): Promise<Game[]> {
 }
 
 export async function getNewestGames(count = 200): Promise<Game[]> {
-  return [...activeGames()].sort(byNewest).slice(0, count);
+  return sortedByNewest().slice(0, count);
 }
 
 export async function getCatalogStats() {
-  const byProvider = activeGames().reduce<Record<string, number>>((acc, game) => {
+  const active = activeGames();
+  const byProvider = active.reduce<Record<string, number>>((acc, game) => {
     const provider = game.provider ?? 'unknown';
     acc[provider] = (acc[provider] ?? 0) + 1;
     return acc;
   }, {});
 
   return {
-    total: activeGames().length,
+    total: active.length,
     byProvider,
   };
 }

@@ -12,6 +12,7 @@ import { useSidebar } from '@/components/providers/SidebarProvider';
 import { useI18n } from '@/components/providers/I18nProvider';
 import type { Game } from '@/lib/types';
 import Logo from '@/components/ui/Logo';
+import { CATEGORIES } from '@/constants/categories';
 
 function SunIcon() {
   return (
@@ -79,6 +80,7 @@ function ThemeSwitch() {
 const NAV_LINKS = [
   { href: '/',          labelKey: 'nav.home'      },
   { href: '/games',     labelKey: 'nav.allGames'  },
+  { href: '/blog',      labelKey: 'nav.blog'      },
   { href: '/about',     labelKey: 'nav.about'     },
   { href: '/kids-site', labelKey: 'nav.forKids'   },
   { href: '/favorites', labelKey: 'nav.favorites' },
@@ -119,6 +121,13 @@ function DesktopSearch() {
   const [popularGames, setPopularGames] = useState<Game[]>([]);
   const [newGames, setNewGames] = useState<Game[]>([]);
   const [dataLoaded, setDataLoaded] = useState(false);
+
+  const matchedCategories = query.trim()
+    ? CATEGORIES.filter((c) =>
+        c.name.toLowerCase().includes(query.trim().toLowerCase()) ||
+        c.slug.toLowerCase().includes(query.trim().toLowerCase())
+      ).slice(0, 6)
+    : [];
 
   useEffect(() => {
     setOpen(false);
@@ -239,7 +248,7 @@ function DesktopSearch() {
                       <div key={i} className="skeleton h-9 w-24 shrink-0 rounded-full" />
                     ))}
                   </div>
-                  <div className="grid grid-cols-6 gap-3">
+                  <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                     {Array.from({ length: 12 }).map((_, i) => (
                       <div key={i} className="space-y-1.5">
                         <div className="skeleton aspect-square rounded-xl" />
@@ -262,7 +271,7 @@ function DesktopSearch() {
                       <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-muted">
                         {t('search.popular')}
                       </h2>
-                      <div className="grid grid-cols-6 gap-3">
+                      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                         {popularGames.map((game) => (
                           <DesktopSearchResult key={game.id} game={game} />
                         ))}
@@ -275,7 +284,7 @@ function DesktopSearch() {
                       <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-muted">
                         {t('search.newGames')}
                       </h2>
-                      <div className="grid grid-cols-6 gap-3">
+                      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                         {newGames.map((game) => (
                           <DesktopSearchResult key={game.id} game={game} />
                         ))}
@@ -285,31 +294,75 @@ function DesktopSearch() {
                 </div>
               )
             ) : searching ? (
-              <div className="grid grid-cols-6 gap-3">
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <div key={i} className="space-y-1.5">
-                    <div className="skeleton aspect-square rounded-xl" />
-                    <div className="skeleton h-2.5 w-3/4 rounded-full" />
-                  </div>
-                ))}
-              </div>
-            ) : results.length > 0 ? (
-              <>
-                <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-muted">
-                  {results.length} {t('search.results')}
-                </h2>
-                <div className="grid grid-cols-6 gap-3">
-                  {results.map((game) => (
-                    <DesktopSearchResult key={game.id} game={game} />
+              <div className="space-y-5">
+                {matchedCategories.length > 0 && (
+                  <section>
+                    <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-muted">
+                      {t('search.categories')}
+                    </h2>
+                    <div className="flex flex-wrap gap-2">
+                      {matchedCategories.map((cat) => (
+                        <Link
+                          key={cat.slug}
+                          href={`/category/${cat.slug}`}
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-1.5 rounded-full border border-border bg-navy px-3 py-1.5 text-xs font-bold text-fg transition-colors duration-150 hover:border-accent/40 hover:text-accent"
+                        >
+                          {cat.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </section>
+                )}
+                <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div key={i} className="space-y-1.5">
+                      <div className="skeleton aspect-square rounded-xl" />
+                      <div className="skeleton h-2.5 w-3/4 rounded-full" />
+                    </div>
                   ))}
                 </div>
-                <button
-                  type="submit"
-                  className="mt-4 flex w-full items-center justify-center rounded-xl bg-accent px-3 py-2.5 text-sm font-bold text-white transition-colors duration-150 hover:bg-accent-hover active-click"
-                >
-                  {t('search.seeAll')}
-                </button>
-              </>
+              </div>
+            ) : results.length > 0 || matchedCategories.length > 0 ? (
+              <div className="space-y-5">
+                {matchedCategories.length > 0 && (
+                  <section>
+                    <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-muted">
+                      {t('search.categories')}
+                    </h2>
+                    <div className="flex flex-wrap gap-2">
+                      {matchedCategories.map((cat) => (
+                        <Link
+                          key={cat.slug}
+                          href={`/category/${cat.slug}`}
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-1.5 rounded-full border border-border bg-navy px-3 py-1.5 text-xs font-bold text-fg transition-colors duration-150 hover:border-accent/40 hover:text-accent"
+                        >
+                          {cat.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </section>
+                )}
+                {results.length > 0 && (
+                  <section>
+                    <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-muted">
+                      {results.length} {t('search.results')}
+                    </h2>
+                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                      {results.map((game) => (
+                        <DesktopSearchResult key={game.id} game={game} />
+                      ))}
+                    </div>
+                    <button
+                      type="submit"
+                      className="mt-4 flex w-full items-center justify-center rounded-xl bg-accent px-3 py-2.5 text-sm font-bold text-white transition-colors duration-150 hover:bg-accent-hover active-click"
+                    >
+                      {t('search.seeAll')}
+                    </button>
+                  </section>
+                )}
+              </div>
             ) : (
               <div className="px-3 py-5 text-center">
                 <p className="text-sm font-bold text-fg">{t('search.noResults')}</p>
@@ -327,6 +380,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { hidden, toggle: toggleSidebar } = useSidebar();
   const { t } = useI18n();
+  const { theme } = useTheme();
 
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -335,7 +389,11 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/60 shadow-[0_2px_20px_oklch(10%_0.01_250/0.10)]">
+      <header className={`sticky top-0 z-50 border-b ${
+        theme === 'dark'
+          ? 'bg-background/80 backdrop-blur-xl border-border/60 shadow-[0_2px_20px_oklch(10%_0.01_250/0.10)]'
+          : 'bg-background border-border/50'
+      }`}>
         <div className="flex items-center h-16">
 
           {/* Desktop: hamburger in w-14 box — aligns with sidebar column */}
@@ -371,15 +429,15 @@ export default function Navbar() {
             {/* Center search bar — desktop only */}
             <nav className="hidden shrink-0 items-center gap-2 xl:col-start-2 xl:flex" aria-label="Primary navigation">
               {NAV_LINKS.map((link) => {
-                const active = pathname === link.href;
+                const active = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
                     className={`rounded-full px-4 py-2 text-sm font-bold transition-all duration-150 active-click ${
                       active
-                        ? 'bg-accent/10 text-accent ring-1 ring-inset ring-accent/25'
-                        : 'text-muted hover:bg-navy hover:text-accent'
+                        ? 'bg-accent text-white'
+                        : 'text-muted hover:bg-navy hover:text-fg'
                     }`}
                   >
                     {t(link.labelKey)}

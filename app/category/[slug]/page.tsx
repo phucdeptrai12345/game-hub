@@ -3,6 +3,7 @@ import { getGamesByCategory } from '@/lib/gamemonetize';
 import { getCategoryBySlug, CATEGORIES } from '@/constants/categories';
 import GameGrid from '@/components/ui/GameGrid';
 import Pagination from '@/components/ui/Pagination';
+import SortDropdown from '@/components/ui/SortDropdown';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
@@ -232,9 +233,9 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const content = getCategoryContent(slug);
 
   const SORT_OPTS = [
-    { value: 'popular', label: 'Popular' },
-    { value: 'new',     label: 'Newest'  },
-    { value: 'az',      label: 'A-Z'     },
+    { value: 'popular', label: 'Top games' },
+    { value: 'new',     label: 'New games' },
+    { value: 'az',      label: 'A-Z'       },
   ];
 
   return (
@@ -250,22 +251,15 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           </p>
         </div>
 
-        {/* Sort buttons */}
-        <div className="flex items-center gap-1 sm:mt-1 sm:shrink-0">
-          {SORT_OPTS.map((opt) => (
-            <Link
-              key={opt.value}
-              href={`/category/${slug}?sort=${opt.value}`}
-              className={`cat-sort-btn rounded-lg px-3.5 py-1.5 text-xs font-bold transition-colors duration-150 ${
-                sort === opt.value
-                  ? 'bg-accent text-white'
-                  : 'text-muted hover:text-fg hover:bg-border/50'
-              }`}
-            >
-              {opt.label}
-            </Link>
-          ))}
-        </div>
+        <SortDropdown
+          activeValue={sort}
+          ariaLabel={`Sort ${cat.name} games`}
+          className="sm:mt-1"
+          options={SORT_OPTS.map((opt) => ({
+            ...opt,
+            href: `/category/${slug}?sort=${opt.value}`,
+          }))}
+        />
       </div>
 
       {paged.length > 0 ? (

@@ -375,9 +375,9 @@ export default async function KidsSitePage() {
 
         <KidsFilterTabs filters={kidsFilters} />
 
-        <KidsGameStrip title="Easy picks" games={easyGames.slice(20, 30)} />
-        <KidsGameStrip title="Puzzle time" games={puzzleGames.slice(8, 18)} />
-        <KidsGameStrip title="Cooking, dress up, and calm games" games={creativeGames.slice(8, 18)} />
+        <KidsGameStrip title="Easy picks" games={easyGames.slice(0, 10)} />
+        <KidsGameStrip title="Puzzle time" games={puzzleGames.slice(0, 10)} />
+        <KidsGameStrip title="Cooking, dress up, and calm games" games={creativeGames.slice(0, 10)} />
 
         <section className="kids-parent-note">
           <div>

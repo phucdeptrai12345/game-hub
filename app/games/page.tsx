@@ -1,8 +1,8 @@
 import { getMostPlayedGames, getNewestGames, getAllGames } from '@/lib/gamemonetize';
 import type { Game } from '@/lib/types';
-import type { GameBadge } from '@/components/ui/GameCard';
 import GameGrid from '@/components/ui/GameGrid';
 import Pagination from '@/components/ui/Pagination';
+import SortDropdown from '@/components/ui/SortDropdown';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
@@ -15,9 +15,9 @@ interface Props {
 }
 
 const SORT_OPTS = [
-  { value: 'popular', label: 'Popular' },
-  { value: 'new',     label: 'New'     },
-  { value: 'az',      label: 'A-Z'     },
+  { value: 'popular', label: 'Top games' },
+  { value: 'new',     label: 'New games' },
+  { value: 'az',      label: 'A-Z'       },
 ];
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
@@ -40,15 +40,12 @@ export default async function GamesPage({ searchParams }: Props) {
   let games: Game[];
   let heading: string;
   let subtext: string;
-  let showRank = false;
-  let badge: GameBadge | undefined;
 
   if (sort === 'new') {
     // Only newest — completely separate from mostPlayed
     games = await getNewestGames(500);
     heading = 'New Arrivals';
     subtext = 'Just dropped';
-    badge = 'new';
 
   } else if (sort === 'az') {
     const all = await getAllGames();
@@ -61,7 +58,6 @@ export default async function GamesPage({ searchParams }: Props) {
     games = await getMostPlayedGames(500);
     heading = 'Top Games';
     subtext = 'Ranked by plays';
-    showRank = true;
   }
 
   const totalPages = Math.ceil(games.length / PAGE_SIZE);
@@ -76,21 +72,13 @@ export default async function GamesPage({ searchParams }: Props) {
           </h1>
           <p className="text-muted text-xs font-medium mt-0.5 uppercase tracking-wider">{subtext}</p>
         </div>
-        <div className="flex items-center gap-px rounded-md border border-border overflow-hidden sm:shrink-0">
-          {SORT_OPTS.map((opt) => (
-            <Link
-              key={opt.value}
-              href={`/games?sort=${opt.value}`}
-              className={`px-4 py-1.5 text-xs font-bold transition-colors duration-100 ${
-                sort === opt.value
-                  ? 'bg-accent text-white'
-                  : 'bg-surface text-muted hover:text-fg hover:bg-accent/10'
-              }`}
-            >
-              {opt.label}
-            </Link>
-          ))}
-        </div>
+        <SortDropdown
+          activeValue={sort}
+          options={SORT_OPTS.map((opt) => ({
+            ...opt,
+            href: `/games?sort=${opt.value}`,
+          }))}
+        />
       </div>
 
       {paged.length > 0 ? (
@@ -98,9 +86,6 @@ export default async function GamesPage({ searchParams }: Props) {
           <GameGrid
             games={paged}
             priorityCount={8}
-            showRank={showRank}
-            badge={badge}
-            badgeCount={sort === 'new' ? 48 : 20}
           />
           <div className="games-pagination">
             <Pagination currentPage={page} totalPages={totalPages} />

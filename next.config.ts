@@ -1,6 +1,13 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Tăng client-side router cache: homepage giữ 30 phút sau khi visit
+    staleTimes: {
+      dynamic: 60,
+      static: 1800,
+    },
+  },
   images: {
     remotePatterns: [
       {

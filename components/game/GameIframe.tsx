@@ -17,13 +17,12 @@ interface Props {
 
 export default function GameIframe({ game }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [started, setStarted] = useState(false);   // click-to-play gate
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadProgress, setLoadProgress] = useState(8);
   const [isFav, setIsFav] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [volume, setVolume] = useState(80);
-  const [showVolume, setShowVolume] = useState(false);
   const { t } = useI18n();
 
   const rawW = parseInt(game.width || '800', 10);
@@ -80,20 +79,16 @@ export default function GameIframe({ game }: Props) {
 
   useEffect(() => {
     try {
-      const stored = parseInt(localStorage.getItem('gz-volume') ?? '80', 10);
-      if (stored === 0) { setMuted(true); setVolume(0); }
-      else setVolume(Math.min(100, Math.max(0, stored)));
+      setMuted(localStorage.getItem('gz-muted') === 'true');
     } catch {}
   }, []);
 
   useEffect(() => {
-    const val = muted ? 0 : volume / 100;
     document.querySelectorAll<HTMLMediaElement>('audio,video').forEach((el) => {
-      el.volume = val;
       el.muted = muted;
     });
-    try { localStorage.setItem('gz-volume', String(muted ? 0 : volume)); } catch {}
-  }, [muted, volume]);
+    try { localStorage.setItem('gz-muted', String(muted)); } catch {}
+  }, [muted]);
 
   useEffect(() => {
     function onFsChange() {
@@ -147,87 +142,106 @@ export default function GameIframe({ game }: Props) {
           backgroundColor: '#000',
         } as CSSProperties}
       >
-        {/* Loading layer until iframe fires onLoad */}
-        {!isLoaded && (
-          <div className="game-loader-overlay" aria-label="Loading game" role="status">
-            <div className="game-loader-thumb" aria-hidden="true">
+        {/* ── Click-to-play overlay (iframe chưa load → trang đủ điều kiện bfcache) ── */}
+        {!started ? (
+          <button
+            className="absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-5 bg-black group"
+            onClick={() => setStarted(true)}
+            aria-label={`Play ${game.title}`}
+          >
+            {/* Blurred background */}
+            <div className="absolute inset-0 overflow-hidden">
               <GameImage
-                game={game}
-                alt=""
-                fill
-                className="object-cover"
-                fallbackClassName="text-[10px]"
-                sizes="96px"
-                priority
+                game={game} alt="" fill
+                className="object-cover scale-105 blur-md opacity-50"
+                fallbackClassName="text-[10px]" sizes="800px" priority
               />
+              <div className="absolute inset-0 bg-black/45" />
             </div>
-            <p className="game-loader-title">{t('game.loading')}</p>
-            <p className="game-loader-subtitle">{game.title}</p>
-            <div className="game-loader-bar" aria-hidden="true">
-              <span style={{ width: `${loadProgress}%` }} />
-            </div>
-            <p className="game-loader-percent">{Math.round(loadProgress)}%</p>
-          </div>
-        )}
 
-        <iframe
-          key={frameSrc}
-          src={frameSrc}
-          title={game.title}
-          allowFullScreen
-          allow="autoplay *; fullscreen *; gamepad *; accelerometer *; gyroscope *"
-          sandbox={sandboxPermissions}
-          scrolling="no"
-          referrerPolicy={game.provider === 'famobi' ? 'origin' : undefined}
-          className="absolute inset-0 h-full w-full border-0"
-          loading="lazy"
-          onLoad={() => {
-            setLoadProgress(100);
-            window.setTimeout(() => setIsLoaded(true), 180);
-          }}
-        />
+            <div className="relative z-10 flex flex-col items-center gap-4 px-6 text-center">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
+                {game.category}
+              </p>
+              <h2
+                className="title-display font-black text-white leading-tight max-w-[260px]"
+                style={{ fontSize: 'clamp(1rem, 2.5vw, 1.4rem)', textWrap: 'balance' }}
+              >
+                {game.title}
+              </h2>
+              <div className="mt-1 flex items-center gap-2.5 rounded-sm bg-accent px-7 py-3
+                transition-all duration-150 group-hover:bg-accent-hover group-hover:translate-y-[-1px]
+                active:scale-[0.98]">
+                <svg className="h-3.5 w-3.5 translate-x-px text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                <span className="text-sm font-black uppercase tracking-wider text-white">
+                  {t('common.playNow')}
+                </span>
+              </div>
+            </div>
+          </button>
+        ) : (
+          <>
+            {/* Loading layer until iframe fires onLoad */}
+            {!isLoaded && (
+              <div className="game-loader-overlay" aria-label="Loading game" role="status">
+                <div className="game-loader-thumb" aria-hidden="true">
+                  <GameImage game={game} alt="" fill className="object-cover" fallbackClassName="text-[10px]" sizes="96px" priority />
+                </div>
+                <p className="game-loader-title">{t('game.loading')}</p>
+                <p className="game-loader-subtitle">{game.title}</p>
+                <div className="game-loader-bar" aria-hidden="true">
+                  <span
+                    style={{ width: `${loadProgress}%` }}
+                    className={loadProgress >= 92 && !isLoaded ? 'animate-pulse' : ''}
+                  />
+                </div>
+                <p className="game-loader-percent">
+                  {loadProgress >= 92 && !isLoaded ? (
+                    <span className="animate-pulse">Loading&hellip;</span>
+                  ) : (
+                    `${Math.round(loadProgress)}%`
+                  )}
+                </p>
+              </div>
+            )}
+
+            <iframe
+              key={frameSrc}
+              src={frameSrc}
+              title={game.title}
+              allowFullScreen
+              allow="autoplay *; fullscreen *; gamepad *; accelerometer *; gyroscope *"
+              sandbox={sandboxPermissions}
+              scrolling="no"
+              referrerPolicy={game.provider === 'famobi' ? 'origin' : undefined}
+              className="absolute inset-0 h-full w-full border-0"
+              loading="lazy"
+              onLoad={() => {
+                setLoadProgress(100);
+                window.setTimeout(() => setIsLoaded(true), 180);
+              }}
+            />
+          </>
+        )}
 
         {/* Scanlines overlay on iframe for high-tech cabinet look */}
         <div className="absolute inset-0 scanlines opacity-[0.04] pointer-events-none" />
 
-        <div className="absolute bottom-3 right-3 z-30 flex items-center gap-2">
-          {/* Volume control */}
+        {started && <div className="absolute bottom-3 right-3 z-30 flex items-center gap-2">
+          {/* Volume toggle — mutes/unmutes page-level audio (video previews etc.) */}
           <div className="relative flex items-center gap-1.5">
-            {showVolume && (
-              <div className="flex items-center gap-1.5 rounded-lg bg-black/70 px-2 py-1.5 backdrop-blur-sm">
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={muted ? 0 : volume}
-                  onChange={(e) => {
-                    const v = Number(e.target.value);
-                    setVolume(v);
-                    setMuted(v === 0);
-                  }}
-                  className="h-1 w-20 cursor-pointer accent-accent"
-                  aria-label={t('game.volume')}
-                />
-              </div>
-            )}
             <button
-              onClick={() => {
-                if (!showVolume) { setShowVolume(true); return; }
-                setMuted((m) => !m);
-              }}
-              onBlur={() => setTimeout(() => setShowVolume(false), 200)}
+              onClick={() => setMuted((m) => !m)}
               className="flex h-9 w-9 items-center justify-center rounded-lg bg-black/45 text-white backdrop-blur-sm transition-colors duration-150 hover:bg-accent active-click"
               aria-label={muted ? t('game.unmute') : t('game.mute')}
               title={muted ? t('game.unmute') : t('game.mute')}
             >
-              {muted || volume === 0 ? (
+              {muted ? (
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2} aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0 2-2m-2 2-2-2m2 2 2 2" />
-                </svg>
-              ) : volume < 50 ? (
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2} aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 0 1 0 7.072M5.586 15H4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                 </svg>
               ) : (
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2} aria-hidden="true">
@@ -266,7 +280,7 @@ export default function GameIframe({ game }: Props) {
               </svg>
             )}
           </button>
-        </div>
+        </div>}
       </div>
     </div>
   );

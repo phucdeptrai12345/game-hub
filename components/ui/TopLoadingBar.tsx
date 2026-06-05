@@ -3,9 +3,9 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useRef, Suspense } from 'react';
 
-const MIN_ROUTE_LOADER_MS = 850;
-const IMAGE_WAIT_TIMEOUT_MS = 1200;
-const MAX_ROUTE_IMAGES = 72;
+const MIN_ROUTE_LOADER_MS = 200;
+const IMAGE_WAIT_TIMEOUT_MS = 400;
+const MAX_ROUTE_IMAGES = 12;
 
 function wait(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -107,6 +107,14 @@ function Bar() {
     timerRef.current = [];
   }
 
+  function reset() {
+    clear();
+    activeRef.current = false;
+    doneRef.current = true;
+    setVisible(false);
+    setWidth(0);
+  }
+
   function start() {
     clear();
     activeRef.current = true;
@@ -150,7 +158,8 @@ function Bar() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, searchParams]);
 
-  // Intercept link clicks to start bar
+  // Intercept in-app link clicks to start bar. Browser Back/Forward should stay
+  // native-fast because those paths are usually restored from the browser cache.
   useEffect(() => {
     function onClick(e: MouseEvent) {
       const a = (e.target as HTMLElement).closest('a');
@@ -164,10 +173,10 @@ function Bar() {
       } catch {}
     }
     document.addEventListener('click', onClick);
-    window.addEventListener('popstate', start);
+    window.addEventListener('pageshow', reset);
     return () => {
       document.removeEventListener('click', onClick);
-      window.removeEventListener('popstate', start);
+      window.removeEventListener('pageshow', reset);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -175,39 +184,18 @@ function Bar() {
   if (!visible) return null;
 
   return (
-    <>
-      <div
-        aria-hidden="true"
-        className="fixed top-0 left-0 z-[9999] h-[3px] pointer-events-none"
-        style={{
-          width: `${width}%`,
-          transition: width === 100 ? 'width 0.2s ease-out' : 'width 0.4s ease-out',
-          background: 'linear-gradient(90deg, var(--color-accent), oklch(70% 0.22 42))',
-          boxShadow: '0 0 10px var(--color-accent), 0 0 4px var(--color-accent)',
-        }}
-      />
-
-      <div className="route-loading-overlay" role="status" aria-label="Loading page">
-        <div className="route-loading-content">
-          <div className="route-loading-mark" aria-hidden="true">
-            <svg className="route-loading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 6H6a4 4 0 0 0-4 4v3a4 4 0 0 0 4 4h1.5a3 3 0 0 1 2.5 1.5L11 20a1 1 0 0 0 2 0l1-1.5a3 3 0 0 1 2.5-1.5H18a4 4 0 0 0 4-4v-3a4 4 0 0 0-4-4z" fill="currentColor" fillOpacity="0.15" />
-              <path d="M6 12h4M8 10v4" />
-              <circle cx="15" cy="11.5" r="1" fill="currentColor" stroke="none" />
-              <circle cx="17.5" cy="13.5" r="1" fill="currentColor" stroke="none" />
-            </svg>
-          </div>
-          <div className="route-loading-brand">
-            Game<span>Zone</span>
-          </div>
-          <div className="route-loading-dots" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-        </div>
-      </div>
-    </>
+    <div
+      role="status"
+      aria-label="Loading page"
+      aria-hidden="true"
+      className="fixed top-0 left-0 z-[9999] h-[2px] pointer-events-none"
+      style={{
+        width: `${width}%`,
+        transition: width === 100 ? 'width 0.2s ease-out' : 'width 0.4s ease-out',
+        background: 'var(--color-accent)',
+        boxShadow: '0 0 8px var(--color-accent)',
+      }}
+    />
   );
 }
 

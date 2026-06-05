@@ -35,10 +35,11 @@ export default function RecentlyPlayedSection() {
     refresh();
   }, [pathname, refresh]);
 
-  // Refresh khi user quay lại tab
+  // Visibility change chỉ refresh nếu có data mới (tránh redundant với pathname effect)
   useEffect(() => {
-    document.addEventListener('visibilitychange', refresh);
-    return () => document.removeEventListener('visibilitychange', refresh);
+    const onVisible = () => { if (!document.hidden) refresh(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
   }, [refresh]);
 
   useEffect(() => {

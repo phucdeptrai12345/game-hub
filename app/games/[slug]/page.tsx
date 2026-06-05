@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   const games = await getAllGames();
-  return games.slice(0, 1000).map((g) => ({ slug: g.slug }));
+  return games.slice(0, 3000).map((g) => ({ slug: g.slug }));
 }
 
 export default async function GamePage({ params }: Props) {
@@ -65,7 +65,7 @@ export default async function GamePage({ params }: Props) {
 
       <div className="relative w-full px-3 sm:px-4 lg:px-5 xl:px-6 py-6">
       {/* Main layout: game + right column */}
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
 
         {/* Left: iframe + info */}
         <div className="min-w-0">
@@ -78,7 +78,7 @@ export default async function GamePage({ params }: Props) {
 
           {/* Title + category */}
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <h1 className="text-2xl md:text-3xl font-black text-fg leading-tight">
+            <h1 className="text-2xl md:text-3xl font-black text-fg leading-tight title-display">
               {game.title}
             </h1>
             <CategoryBadge category={game.category} className="category-badge self-start sm:mt-1 sm:shrink-0" />
@@ -113,7 +113,7 @@ export default async function GamePage({ params }: Props) {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <span className="w-1 h-5 rounded-full bg-accent" aria-hidden="true" />
-                <p className="text-sm font-black text-fg uppercase tracking-wide">
+                <p className="text-base font-black text-fg uppercase tracking-wide title-display">
                   More {game.category} Games
                 </p>
               </div>

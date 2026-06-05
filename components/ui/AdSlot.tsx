@@ -22,6 +22,12 @@ const AD_SLOT_IDS: Record<string, string | undefined> = {
   'game-side-top': process.env.NEXT_PUBLIC_ADSENSE_SLOT_GAME_SIDE_TOP,
   'game-side-bottom': process.env.NEXT_PUBLIC_ADSENSE_SLOT_GAME_SIDE_BOTTOM,
   'game-before-more': process.env.NEXT_PUBLIC_ADSENSE_SLOT_GAME_BEFORE_MORE,
+  'blog-top': process.env.NEXT_PUBLIC_ADSENSE_SLOT_BLOG_TOP,
+  'blog-infeed': process.env.NEXT_PUBLIC_ADSENSE_SLOT_BLOG_INFEED,
+  'blog-post-top': process.env.NEXT_PUBLIC_ADSENSE_SLOT_BLOG_POST_TOP,
+  'blog-post-mid': process.env.NEXT_PUBLIC_ADSENSE_SLOT_BLOG_POST_MID,
+  'blog-sidebar': process.env.NEXT_PUBLIC_ADSENSE_SLOT_BLOG_SIDEBAR,
+  'blog-sidebar-bottom': process.env.NEXT_PUBLIC_ADSENSE_SLOT_BLOG_SIDEBAR_BOTTOM,
 };
 
 const variantClass = {

@@ -4,19 +4,18 @@ export default function Loading() {
       {/* Header */}
       <div className="flex items-start justify-between mb-7">
         <div>
-          <div className="skeleton h-9 w-48 rounded-xl mb-2.5" />
-          <div className="skeleton h-4 w-72 rounded-full" />
+          <div className="skeleton h-8 w-44 rounded-[3px] mb-2" />
+          <div className="skeleton h-3.5 w-64 rounded-[2px]" />
         </div>
         <div className="flex gap-1.5 mt-1">
-          {[64, 56, 44].map((w, i) => (
-            <div key={i} className="skeleton h-8 rounded-full" style={{ width: `${w}px` }} />
+          {[60, 52, 40].map((w, i) => (
+            <div key={i} className="skeleton h-7 rounded-sm" style={{ width: `${w}px`, animationDelay: `${i * 40}ms` }} />
           ))}
         </div>
       </div>
-      {/* Grid */}
       <div className="grid-standard">
         {Array.from({ length: 20 }).map((_, i) => (
-          <div key={i} className="skeleton rounded-xl w-full aspect-square"
+          <div key={i} className="skeleton rounded-sm w-full aspect-square"
             style={{ animationDelay: `${i * 30}ms` }} />
         ))}
       </div>

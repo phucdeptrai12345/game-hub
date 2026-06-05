@@ -9,8 +9,10 @@ import SearchAnimations from './SearchAnimations';
 
 export const revalidate = 3600;
 
+const PAGE_SIZE = 48;
+
 interface Props {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
@@ -25,10 +27,16 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 export default async function SearchPage({ searchParams }: Props) {
   const params = await searchParams;
   const query = params.q ?? '';
-  let results: Game[] = [];
+  const page = Math.max(1, parseInt(params.page ?? '1', 10));
+
+  let allResults: Game[] = [];
   if (query) {
-    results = await searchGames(query);
+    allResults = await searchGames(query);
   }
+
+  const total = allResults.length;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const results = allResults.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div className="w-full px-3 sm:px-4 lg:px-5 xl:px-6 py-10">
@@ -52,14 +60,46 @@ export default async function SearchPage({ searchParams }: Props) {
       </div>
 
       {query ? (
-        results.length > 0 ? (
+        total > 0 ? (
           <>
             <p className="search-result-count text-muted text-sm font-bold mb-6" aria-live="polite" aria-atomic="true">
-              {results.length.toLocaleString()} game{results.length !== 1 ? 's' : ''} found
+              {total.toLocaleString()} game{total !== 1 ? 's' : ''} found
+              {totalPages > 1 && ` — page ${page} of ${totalPages}`}
             </p>
             <div className="search-results">
               <GameGrid games={results} priorityCount={8} />
             </div>
+            {totalPages > 1 && (
+              <nav className="mt-10 flex items-center justify-center flex-wrap gap-2" aria-label="Search results pagination">
+                {page > 1 && (
+                  <Link href={`/search?q=${encodeURIComponent(query)}&page=${page - 1}`}
+                    className="rounded-xl border border-border bg-surface px-5 py-2 text-sm font-bold text-fg hover:bg-navy hover:border-accent/40 transition-all">
+                    ← Prev
+                  </Link>
+                )}
+                {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                  let p: number;
+                  if (totalPages <= 7) p = i + 1;
+                  else if (page <= 4) p = i + 1;
+                  else if (page >= totalPages - 3) p = totalPages - 6 + i;
+                  else p = page - 3 + i;
+                  return (
+                    <Link key={p} href={`/search?q=${encodeURIComponent(query)}${p > 1 ? `&page=${p}` : ''}`}
+                      className={`min-w-[2.5rem] rounded-xl px-3 py-2 text-sm font-bold text-center transition-all ${
+                        p === page ? 'bg-accent text-white' : 'border border-border bg-surface text-muted hover:bg-navy hover:text-fg'
+                      }`}>
+                      {p}
+                    </Link>
+                  );
+                })}
+                {page < totalPages && (
+                  <Link href={`/search?q=${encodeURIComponent(query)}&page=${page + 1}`}
+                    className="rounded-xl border border-border bg-surface px-5 py-2 text-sm font-bold text-fg hover:bg-navy hover:border-accent/40 transition-all">
+                    Next →
+                  </Link>
+                )}
+              </nav>
+            )}
           </>
         ) : (
           <NoResults query={query} />

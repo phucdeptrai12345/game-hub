@@ -7,6 +7,7 @@ import RecentlyPlayedSection from '@/components/ui/RecentlyPlayedSection';
 import HeroGameTicker from '@/components/ui/HeroGameTicker';
 import HomeVideoDemos from '@/components/ui/HomeVideoDemos';
 import AdSlot from '@/components/ui/AdSlot';
+import DeferredSection from '@/components/ui/DeferredSection';
 import GameImage from '@/components/ui/GameImage';
 import type { Metadata } from 'next';
 import { slugify } from '@/lib/utils';
@@ -72,15 +73,15 @@ export default async function HomePage() {
 
   const featuredGames = homepageGames.slice(0, 18);
   const trendingGames = homepageGames.slice(54, 72);
-  const popularGames  = homepageGames.slice(18, 58);
-  const tickerGames = homepageGames.slice(6, 30);
+  const popularGames  = homepageGames.slice(18, 48);
+  const tickerGames = homepageGames.slice(6, 26);
   const topFreeGames = homepageGames.slice(0, 5);
   const featuredPicks = homepageGames.slice(72, 77);
   const topPickGames = uniqueById([
-    ...homepageGames.slice(30, 48),
-    ...newReleases.slice(0, 10),
-    ...homepageGames.slice(84, 112),
-  ]).slice(0, 30);
+    ...homepageGames.slice(30, 44),
+    ...newReleases.slice(0, 8),
+    ...homepageGames.slice(84, 100),
+  ]).slice(0, 20); // 30→20 games
   const videoDemoGames = [
     'cooking-rage',
     'zigzag-snow-mountain',
@@ -95,7 +96,7 @@ export default async function HomePage() {
       ...allGames.filter((g) => slugify(g.category) === slug),
       ...allGames.filter((g) => (CATEGORY_FALLBACKS[slug] ?? []).includes(slugify(g.category))),
       ...allGames.filter((g) => g.tags.some((tag) => slugify(tag) === slug)),
-    ]).slice(0, 30),
+    ]).slice(0, 16), // 30→16 per category row
   }));
 
   const categoryCount = (...slugs: string[]) => {
@@ -176,7 +177,7 @@ export default async function HomePage() {
   ];
 
   return (
-    <div className="home-pattern relative overflow-hidden">
+    <div className="relative overflow-hidden">
       {/* Hero */}
       <section className="home-hero-glow relative pt-5 pb-4 md:py-6">
         {/* Floating bubbles */}
@@ -199,12 +200,8 @@ export default async function HomePage() {
         <div className="relative z-10 w-full px-3 sm:px-4 lg:px-5 xl:px-6">
           <div className="grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.08fr)_minmax(620px,0.95fr)] lg:items-start lg:gap-4">
             <div className="min-w-0 max-w-full pt-1 md:pt-2 lg:max-w-[920px]">
-              <div className="mb-3 flex max-w-full items-center gap-2">
-                <span className="relative flex h-3 w-3 shrink-0 items-center justify-center" aria-hidden="true">
-                  <span className="home-live-dot absolute h-3 w-3 rounded-full bg-emerald-400/35" />
-                  <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_oklch(76%_0.18_145/0.55)]" />
-                </span>
-                <span className="min-w-0 truncate text-[0.72rem] font-bold tracking-[0.06em] text-muted/70 sm:text-sm sm:tracking-[0.07em]">
+              <div className="mb-3">
+                <span className="text-[0.72rem] font-bold tracking-[0.06em] text-muted/70 sm:text-sm sm:tracking-[0.07em]">
                   Computer &amp; mobile games · No sign-up
                 </span>
               </div>
@@ -233,12 +230,12 @@ export default async function HomePage() {
 
       <div className="relative z-10 w-full px-3 pb-12 sm:px-4 lg:px-5 xl:px-6 space-y-8">
 
-        {/* Recently Played — client component, shows only if localStorage has data */}
-        <AdSlot slot="home-top-leaderboard" variant="leaderboard" />
-
-        <HomeVideoDemos games={videoDemoGames} />
-
-        <RecentlyPlayedSection />
+        {/* ── Above-fold deferred (AdSlot + Video + RecentlyPlayed) ── */}
+        <DeferredSection>
+          <AdSlot slot="home-top-leaderboard" variant="leaderboard" />
+          <HomeVideoDemos games={videoDemoGames} />
+          <RecentlyPlayedSection />
+        </DeferredSection>
 
         <CategoryRow
           title="Top picks for you"
@@ -279,6 +276,9 @@ export default async function HomePage() {
             showRank
           />
         </section>
+
+        {/* ── Below-fold: deferred sau khi above-fold paint xong ── */}
+        <DeferredSection>
 
         <AdSlot slot="home-after-popular" variant="infeed" />
 
@@ -393,7 +393,7 @@ export default async function HomePage() {
 
               <section className="grid grid-cols-1 gap-8 border-y border-border/60 py-8 lg:grid-cols-3">
                 <div>
-                  <h3 className="mb-4 text-base font-black uppercase tracking-wide text-accent">
+                  <h3 className="mb-4 text-base font-black uppercase tracking-wide text-accent title-display">
                     Play with friends
                   </h3>
                   <div className="space-y-4">
@@ -410,7 +410,7 @@ export default async function HomePage() {
                 </div>
 
                 <div>
-                  <h3 className="mb-4 text-base font-black uppercase tracking-wide text-accent">
+                  <h3 className="mb-4 text-base font-black uppercase tracking-wide text-accent title-display">
                     Challenge yourself
                   </h3>
                   <div className="space-y-4">
@@ -427,7 +427,7 @@ export default async function HomePage() {
                 </div>
 
                 <div>
-                  <h3 className="mb-4 text-base font-black uppercase tracking-wide text-accent">
+                  <h3 className="mb-4 text-base font-black uppercase tracking-wide text-accent title-display">
                     Games to relax
                   </h3>
                   <div className="space-y-4">
@@ -517,6 +517,8 @@ export default async function HomePage() {
             </aside>
           </div>
         </section>
+
+        </DeferredSection>
       </div>
     </div>
   );
