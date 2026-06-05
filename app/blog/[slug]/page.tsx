@@ -193,19 +193,19 @@ export default async function BlogPostPage({ params }: Props) {
           <AdSlot slot="blog-post-top" variant="leaderboard" className="my-8" />
 
           <div className="max-w-[78ch] text-[16px] font-semibold leading-[1.82] text-fg/86">
-            {generated.intro.split(/\n+/).filter(Boolean).map((paragraph, index) => (
+            {(generated.intro || '').split(/\n+/).filter(Boolean).map((paragraph, index) => (
               <p key={`intro-${index}`} className="mb-[1.25em]" style={{ textWrap: 'pretty' }}>
                 {paragraph}
               </p>
             ))}
 
-            {generated.sections.map((section, sectionIndex) => (
+            {generated.sections.filter(s => s.heading && s.body).map((section, sectionIndex) => (
               <div key={`section-${sectionIndex}`}>
                 <h2 className="title-display mt-10 mb-4 text-2xl font-black uppercase leading-tight tracking-tight text-fg">
                   {section.heading}
                 </h2>
 
-                {section.body.split(/\n+/).filter(Boolean).map((paragraph, paragraphIndex) => (
+                {(section.body || '').split(/\n+/).filter(Boolean).map((paragraph, paragraphIndex) => (
                   <p
                     key={`section-${sectionIndex}-paragraph-${paragraphIndex}`}
                     className="mb-[1.25em]"

@@ -99,6 +99,9 @@ Respond ONLY with valid JSON in this exact format:
 
     const parsed = JSON.parse(text) as GeneratedContent;
     if (!parsed.intro || !Array.isArray(parsed.sections)) return null;
+    parsed.sections = parsed.sections.filter(
+      (s) => s && typeof s.heading === 'string' && typeof s.body === 'string',
+    );
 
     // Save to disk — won't regenerate next time
     writeCache(game.slug, parsed);
