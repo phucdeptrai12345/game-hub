@@ -80,11 +80,11 @@ export default async function AboutPage() {
           </div>
 
           {/* Headline */}
-          <h1 className="title-display font-black leading-[1] tracking-tight mb-8 text-4xl sm:text-5xl lg:text-[4.5rem]">
-            <span className="about-hero-l1 block bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500">
+          <h1 className="title-display font-black leading-[1.15] tracking-tight mb-8 text-4xl sm:text-5xl lg:text-[4.5rem]">
+            <span className="about-hero-l1 block bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 pb-[0.1em]">
               Open a game.
             </span>
-            <span className="about-hero-l2 block bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 to-rose-500">
+            <span className="about-hero-l2 block bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 to-rose-500 pb-[0.1em]">
               Start playing.
             </span>
           </h1>
