@@ -64,14 +64,14 @@ export default async function AboutPage() {
       {/* ══ S1 · HERO ═════════════════════════════════════════════════ */}
       <section
         id="s1"
-        className="about-section snap-start snap-always relative px-6 sm:px-10 lg:px-16 xl:px-24 min-h-[calc(100vh-4rem)] flex flex-col justify-center overflow-hidden"
+        className="about-section snap-start snap-always relative px-6 sm:px-10 lg:px-16 xl:px-24 min-h-[calc(100vh-4rem)] flex flex-col justify-center"
       >
-        {/* Grid pattern */}
-        <div className="absolute inset-0 -z-10 about-grid-pattern" />
-
-        {/* Floating orbs */}
-        <div className="about-orb about-orb-1 absolute w-[500px] h-[500px] rounded-full -top-32 -left-32 bg-gradient-to-br from-blue-500/20 to-cyan-500/10 blur-[80px] pointer-events-none -z-10" />
-        <div className="about-orb about-orb-2 absolute w-[400px] h-[400px] rounded-full bottom-0 right-0 bg-gradient-to-tl from-fuchsia-500/20 to-rose-500/10 blur-[80px] pointer-events-none -z-10" />
+        {/* Grid pattern + orbs clipped separately so text isn't affected */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="about-grid-pattern absolute inset-0" />
+          <div className="about-orb about-orb-1 absolute w-[500px] h-[500px] rounded-full -top-32 -left-32 bg-gradient-to-br from-blue-500/20 to-cyan-500/10 blur-[80px] pointer-events-none" />
+          <div className="about-orb about-orb-2 absolute w-[400px] h-[400px] rounded-full bottom-0 right-0 bg-gradient-to-tl from-fuchsia-500/20 to-rose-500/10 blur-[80px] pointer-events-none" />
+        </div>
 
         <div className="max-w-5xl mx-auto w-full">
           {/* Badge */}
@@ -80,11 +80,11 @@ export default async function AboutPage() {
           </div>
 
           {/* Headline */}
-          <h1 className="title-display font-black leading-[1.15] tracking-tight mb-8 text-4xl sm:text-5xl lg:text-[4.5rem]">
-            <span className="about-hero-l1 block bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 pb-[0.1em]">
+          <h1 className="title-display font-black leading-[1.25] tracking-tight mb-8 text-4xl sm:text-5xl lg:text-[4.5rem]">
+            <span className="about-hero-l1 block bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 pb-[0.25em]">
               Open a game.
             </span>
-            <span className="about-hero-l2 block bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 to-rose-500 pb-[0.1em]">
+            <span className="about-hero-l2 block bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 to-rose-500 pb-[0.25em]">
               Start playing.
             </span>
           </h1>
