@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getAllGames, getMostPlayedGames, getNewestGames } from '@/lib/gamemonetize';
+import { getAllGames, getMostPlayedGames, getNewestGames, getGamesForCategoryRow } from '@/lib/gamemonetize';
 import GameGrid from '@/components/ui/GameGrid';
 import FeaturedCollection from '@/components/ui/FeaturedCollection';
 import CategoryRow from '@/components/ui/CategoryRow';
@@ -89,14 +89,10 @@ export default async function HomePage() {
     'fun-race-3d',
   ].flatMap((slug) => allGames.filter((game) => game.slug === slug).slice(0, 1));
 
-  // Build category rows from the full catalog so rows do not look empty.
+  // Build category rows — results are module-level cached (computed once per server instance)
   const catRows = CATEGORY_ROWS.map(({ slug, name, icon }) => ({
     slug, name, icon,
-    games: uniqueById([
-      ...allGames.filter((g) => slugify(g.category) === slug),
-      ...allGames.filter((g) => (CATEGORY_FALLBACKS[slug] ?? []).includes(slugify(g.category))),
-      ...allGames.filter((g) => g.tags.some((tag) => slugify(tag) === slug)),
-    ]).slice(0, 16), // 30→16 per category row
+    games: getGamesForCategoryRow(slug, CATEGORY_FALLBACKS[slug] ?? []),
   }));
 
   const categoryCount = (...slugs: string[]) => {

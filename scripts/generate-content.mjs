@@ -25,11 +25,36 @@ if (fs.existsSync(envPath)) {
   }
 }
 
-const GROQ_KEY = process.env.GROQ_API_KEY;
+// ── Collect all Groq keys: GROQ_API_KEY, GROQ_API_KEY_1, GROQ_API_KEY_2, … ──
+const GROQ_KEYS = [
+  process.env.GROQ_API_KEY,
+  ...Array.from({ length: 10 }, (_, i) => process.env[`GROQ_API_KEY_${i + 1}`]),
+].filter(Boolean);
 
-if (!GROQ_KEY) {
-  console.error('❌  GROQ_API_KEY not found in .env.local');
+if (GROQ_KEYS.length === 0) {
+  console.error('❌  No GROQ_API_KEY found in .env.local');
   process.exit(1);
+}
+
+console.log(`🔑  Groq keys loaded: ${GROQ_KEYS.length}`);
+
+// Key rotation state — shared across workers
+let keyIdx        = 0;
+const exhausted   = new Set(); // indices of keys that hit daily quota
+
+function currentKey() {
+  return GROQ_KEYS[keyIdx];
+}
+
+function rotateKey(reason) {
+  exhausted.add(keyIdx);
+  const next = GROQ_KEYS.findIndex((_, i) => !exhausted.has(i));
+  if (next === -1) {
+    console.error('\n⛔  All Groq keys exhausted for today. Run again tomorrow.');
+    process.exit(1);
+  }
+  keyIdx = next;
+  console.log(`\n🔄  Rotated to key #${keyIdx + 1} (${reason})\n`);
 }
 
 // ── CLI args ───────────────────────────────────────────────────────────────
@@ -130,10 +155,9 @@ function validate(parsed) {
 }
 
 // ── API callers ────────────────────────────────────────────────────────────
-const groqClient = GROQ_KEY ? new Groq({ apiKey: GROQ_KEY }) : null;
-
 async function callGroq(game) {
-  const res = await groqClient.chat.completions.create({
+  const client = new Groq({ apiKey: currentKey() });
+  const res = await client.chat.completions.create({
     model: 'llama-3.1-8b-instant',
     messages: [{ role: 'user', content: buildPrompt(game) }],
     temperature: 0.75,
@@ -194,10 +218,11 @@ async function worker(name, callFn, delayMs) {
       const prefix = `[${displayIdx}/${todo.length}][${name}]`;
       const label  = game.title.slice(0, 40).padEnd(40);
 
-      let attempts = 0;
-      let success  = false;
+      let attempts    = 0;
+      let consecutive429 = 0;
+      let success     = false;
 
-      while (attempts < 6) {
+      while (attempts < 8) {
         attempts++;
         try {
           const content = await callFn(game);
@@ -207,23 +232,33 @@ async function worker(name, callFn, delayMs) {
             'utf-8'
           );
           done++;
+          consecutive429 = 0;
           const elapsed   = Math.round((Date.now() - startTime) / 1000);
           const rate      = done / (elapsed || 1);
           const left      = Math.round((todo.length - done) / rate);
           const leftStr   = left > 3600 ? `${(left/3600).toFixed(1)}h` : `${Math.round(left/60)}m`;
-          console.log(`${prefix} ✅  ${label}  (~${leftStr} left)`);
+          console.log(`${prefix} ✅  ${label}  (key#${keyIdx+1}, ~${leftStr} left)`);
           success = true;
           break;
         } catch (err) {
           const msg   = String(err?.message ?? '');
           const is429 = err?.status === 429 || msg.includes('429') || msg.toLowerCase().includes('rate limit');
-          if (is429 && attempts < 6) {
-            const backoff = Math.min(attempts * 30000, 120000);
-            console.log(`${prefix} ⏳  ${label}  rate limit, waiting ${backoff/1000}s...`);
-            await sleep(backoff);
-          } else if (attempts < 6) {
+
+          if (is429) {
+            consecutive429++;
+            // After 2 consecutive 429s on same key → assume daily quota, rotate key
+            if (consecutive429 >= 2) {
+              rotateKey(`key#${keyIdx+1} hit quota`);
+              consecutive429 = 0;
+              attempts = 0; // reset attempts for new key
+            } else {
+              // First 429 — might be per-minute, wait 60s then retry same key
+              console.log(`${prefix} ⏳  ${label}  rate limit (key#${keyIdx+1}), waiting 60s...`);
+              await sleep(60000);
+            }
+          } else if (attempts < 8) {
             console.log(`${prefix} ⚠️   ${label}  retry ${attempts}: ${msg.slice(0, 80)}`);
-            await sleep(4000);
+            await sleep(5000);
           } else {
             console.log(`${prefix} ❌  ${label}  ${msg.slice(0, 80)}`);
             errors++;

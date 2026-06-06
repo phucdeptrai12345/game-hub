@@ -1,6 +1,7 @@
 import catalog from '@/data/games.json';
 import type { Game } from './types';
 import { BLOCKED_DEVELOPERS, BLOCKED_GAME_IDS, BLOCKED_KEYWORDS } from './game-blocklist';
+import { slugify } from './utils';
 
 const games = catalog as Game[];
 const ENABLE_FAMOBI_INLINE =
@@ -49,6 +50,7 @@ function isDirectPlayable(game: Game): boolean {
 // Module-level caches — computed once per server instance
 let _activeCache: Game[] | null = null;
 let _newestCache: Game[] | null = null;
+const _catGamesCache = new Map<string, Game[]>();
 
 function activeGames(): Game[] {
   if (!_activeCache) {
@@ -76,6 +78,27 @@ function byNewest(a: Game, b: Game): number {
 
 export async function getAllGames(): Promise<Game[]> {
   return activeGames();
+}
+
+function uniqueById(items: Game[]): Game[] {
+  const seen = new Set<string>();
+  return items.filter((g) => (seen.has(g.id) ? false : (seen.add(g.id), true)));
+}
+
+export function getGamesForCategoryRow(slug: string, fallbackSlugs: string[] = [], limit = 16): Game[] {
+  const key = `${slug}|${fallbackSlugs.join(',')}|${limit}`;
+  if (_catGamesCache.has(key)) return _catGamesCache.get(key)!;
+
+  const all = activeGames();
+  const catSlug = slug;
+  const result = uniqueById([
+    ...all.filter((g) => slugify(g.category) === catSlug),
+    ...all.filter((g) => fallbackSlugs.includes(slugify(g.category))),
+    ...all.filter((g) => g.tags.some((t) => slugify(t) === catSlug)),
+  ]).slice(0, limit);
+
+  _catGamesCache.set(key, result);
+  return result;
 }
 
 export async function getGameBySlug(slug: string): Promise<Game | null> {
