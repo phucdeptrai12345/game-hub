@@ -5,8 +5,6 @@ import type { ReactNode } from 'react';
 
 function shouldUsePattern(pathname: string) {
   return !(
-    pathname === '/about' ||
-    pathname.startsWith('/about/') ||
     pathname === '/kids-site' ||
     pathname.startsWith('/kids-site/')
   );

@@ -66,11 +66,10 @@ export default async function AboutPage() {
         id="s1"
         className="about-section snap-start snap-always relative px-6 sm:px-10 lg:px-16 xl:px-24 min-h-[calc(100vh-4rem)] flex flex-col justify-center"
       >
-        {/* Grid pattern + orbs clipped separately so text isn't affected */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div className="about-grid-pattern absolute inset-0" />
-          <div className="about-orb about-orb-1 absolute w-[500px] h-[500px] rounded-full -top-32 -left-32 bg-gradient-to-br from-blue-500/20 to-cyan-500/10 blur-[80px] pointer-events-none" />
-          <div className="about-orb about-orb-2 absolute w-[400px] h-[400px] rounded-full bottom-0 right-0 bg-gradient-to-tl from-fuchsia-500/20 to-rose-500/10 blur-[80px] pointer-events-none" />
+        {/* Orbs clipped separately so text isn't affected */}
+        <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+          <div className="about-orb about-orb-1 absolute w-[500px] h-[500px] rounded-full -top-32 -left-32 bg-gradient-to-br from-blue-500/20 to-cyan-500/10 blur-[80px]" />
+          <div className="about-orb about-orb-2 absolute w-[400px] h-[400px] rounded-full bottom-0 right-0 bg-gradient-to-tl from-fuchsia-500/20 to-rose-500/10 blur-[80px]" />
         </div>
 
         <div className="max-w-5xl mx-auto w-full">
