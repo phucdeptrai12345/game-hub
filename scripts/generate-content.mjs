@@ -38,23 +38,41 @@ if (GROQ_KEYS.length === 0) {
 
 console.log(`🔑  Groq keys loaded: ${GROQ_KEYS.length}`);
 
-// Key rotation state — shared across workers
-let keyIdx        = 0;
-const exhausted   = new Set(); // indices of keys that hit daily quota
+// ── Round-robin key manager ────────────────────────────────────────────────
+// Groq free tier: ~6,000 tokens/min per key. Each request ≈ 5,000 tokens.
+// → Need 65s minimum between uses of the same key.
+let rrKeyIdx        = 0;
+const keyLastUsedAt = new Array(GROQ_KEYS.length).fill(0);  // last request time
+const keyAvailableAt = new Array(GROQ_KEYS.length).fill(0); // extra cooldown from 429
+const KEY_MIN_MS    = 65000; // 65s minimum spacing per key
 
-function currentKey() {
-  return GROQ_KEYS[keyIdx];
+async function getNextKey() {
+  while (true) {
+    const now = Date.now();
+    for (let i = 0; i < GROQ_KEYS.length; i++) {
+      const idx       = (rrKeyIdx + i) % GROQ_KEYS.length;
+      const minAvail  = Math.max(keyAvailableAt[idx], keyLastUsedAt[idx] + KEY_MIN_MS);
+      if (now >= minAvail) {
+        rrKeyIdx          = (idx + 1) % GROQ_KEYS.length;
+        keyLastUsedAt[idx] = now;
+        return idx;
+      }
+    }
+    // All keys busy — wait for the soonest available
+    const nextAvail = Math.min(
+      ...keyAvailableAt.map((ca, i) => Math.max(ca, keyLastUsedAt[i] + KEY_MIN_MS))
+    );
+    const waitMs = nextAvail - now;
+    if (waitMs > 100) {
+      console.log(`  ⏳ All ${GROQ_KEYS.length} keys spacing, waiting ${Math.ceil(waitMs / 1000)}s...`);
+      await sleep(waitMs + 150);
+    }
+  }
 }
 
-function rotateKey(reason) {
-  exhausted.add(keyIdx);
-  const next = GROQ_KEYS.findIndex((_, i) => !exhausted.has(i));
-  if (next === -1) {
-    console.error('\n⛔  All Groq keys exhausted for today. Run again tomorrow.');
-    process.exit(1);
-  }
-  keyIdx = next;
-  console.log(`\n🔄  Rotated to key #${keyIdx + 1} (${reason})\n`);
+function cooldownKey(idx, ms = 120000) {
+  keyAvailableAt[idx] = Date.now() + ms;
+  console.log(`  🔄 key#${idx + 1} rate-limited → 2min extra cooldown`);
 }
 
 // ── CLI args ───────────────────────────────────────────────────────────────
@@ -156,15 +174,23 @@ function validate(parsed) {
 
 // ── API callers ────────────────────────────────────────────────────────────
 async function callGroq(game) {
-  const client = new Groq({ apiKey: currentKey() });
-  const res = await client.chat.completions.create({
-    model: 'llama-3.1-8b-instant',
-    messages: [{ role: 'user', content: buildPrompt(game) }],
-    temperature: 0.75,
-    max_tokens: 4096,
-    response_format: { type: 'json_object' },
-  });
-  return validate(JSON.parse(res.choices[0]?.message?.content ?? '{}'));
+  const idx    = await getNextKey();
+  const client = new Groq({ apiKey: GROQ_KEYS[idx] });
+  try {
+    const res = await client.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      messages: [{ role: 'user', content: buildPrompt(game) }],
+      temperature: 0.75,
+      max_tokens: 4096,
+      response_format: { type: 'json_object' },
+    });
+    return { content: validate(JSON.parse(res.choices[0]?.message?.content ?? '{}')), keyIdx: idx };
+  } catch (err) {
+    const msg   = String(err?.message ?? '');
+    const is429 = err?.status === 429 || msg.includes('429') || msg.toLowerCase().includes('rate limit');
+    if (is429) cooldownKey(idx);
+    throw err;
+  }
 }
 
 async function callMistral(game) {
@@ -215,58 +241,47 @@ async function worker(name, callFn, delayMs) {
       if (!game) break;
 
       const displayIdx = String(queueIdx).padStart(PAD, ' ');
-      const prefix = `[${displayIdx}/${todo.length}][${name}]`;
-      const label  = game.title.slice(0, 40).padEnd(40);
+      const prefix     = `[${displayIdx}/${todo.length}][${name}]`;
+      const label      = game.title.slice(0, 40).padEnd(40);
 
-      let attempts    = 0;
-      let consecutive429 = 0;
-      let success     = false;
+      let attempts = 0;
+      let success  = false;
 
-      while (attempts < 8) {
+      while (attempts < 15 && !success) {
         attempts++;
         try {
-          const content = await callFn(game);
+          const { content, keyIdx: usedKey } = await callFn(game);
           fs.writeFileSync(
             path.join(CACHE_DIR, `${game.slug}.json`),
             JSON.stringify(content, null, 2),
             'utf-8'
           );
           done++;
-          consecutive429 = 0;
-          const elapsed   = Math.round((Date.now() - startTime) / 1000);
-          const rate      = done / (elapsed || 1);
-          const left      = Math.round((todo.length - done) / rate);
-          const leftStr   = left > 3600 ? `${(left/3600).toFixed(1)}h` : `${Math.round(left/60)}m`;
-          console.log(`${prefix} ✅  ${label}  (key#${keyIdx+1}, ~${leftStr} left)`);
+          const elapsed = Math.round((Date.now() - startTime) / 1000);
+          const rate    = done / (elapsed || 1);
+          const left    = Math.round((todo.length - done) / rate);
+          const leftStr = left > 3600 ? `${(left / 3600).toFixed(1)}h` : `${Math.round(left / 60)}m`;
+          console.log(`${prefix} ✅  ${label}  (key#${usedKey + 1}, ~${leftStr} left)`);
           success = true;
-          break;
         } catch (err) {
           const msg   = String(err?.message ?? '');
           const is429 = err?.status === 429 || msg.includes('429') || msg.toLowerCase().includes('rate limit');
-
           if (is429) {
-            consecutive429++;
-            // After 2 consecutive 429s on same key → assume daily quota, rotate key
-            if (consecutive429 >= 2) {
-              rotateKey(`key#${keyIdx+1} hit quota`);
-              consecutive429 = 0;
-              attempts = 0; // reset attempts for new key
-            } else {
-              // First 429 — might be per-minute, wait 60s then retry same key
-              console.log(`${prefix} ⏳  ${label}  rate limit (key#${keyIdx+1}), waiting 60s...`);
-              await sleep(60000);
-            }
-          } else if (attempts < 8) {
-            console.log(`${prefix} ⚠️   ${label}  retry ${attempts}: ${msg.slice(0, 80)}`);
-            await sleep(5000);
+            // Key already put on cooldown by callGroq; next attempt picks a fresh key
+            console.log(`${prefix} 🔄  ${label}  rate limit, switching key (attempt ${attempts})...`);
           } else {
-            console.log(`${prefix} ❌  ${label}  ${msg.slice(0, 80)}`);
-            errors++;
+            console.log(`${prefix} ⚠️   ${label}  retry ${attempts}: ${msg.slice(0, 80)}`);
+            await sleep(4000);
           }
         }
       }
 
-      if (success) await sleep(delayMs);
+      if (!success) {
+        console.log(`${prefix} ❌  ${label}  gave up after ${attempts} attempts`);
+        errors++;
+      } else {
+        await sleep(delayMs);
+      }
     }
     console.log(`\n[${name}] ✔  Worker finished.`);
   } catch (fatal) {
@@ -274,7 +289,7 @@ async function worker(name, callFn, delayMs) {
   }
 }
 
-await worker('groq', callGroq, 3000);
+await worker('groq', callGroq, 1500);
 
 // ── Summary ────────────────────────────────────────────────────────────────
 const totalSecs = Math.round((Date.now() - startTime) / 1000);
